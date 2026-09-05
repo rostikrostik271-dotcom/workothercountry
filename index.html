@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Overseas Jobs</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root{
+    --ink: #14213d;
+    --ink-soft: #4a5578;
+    --line: #dfe3ec;
+    --paper: #f6f7fb;
+    --accent: #1d5b46;
+    --accent-soft: #e4efe9;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  header{
+    padding: 22px 18px 16px;
+    border-bottom: 1px solid var(--line);
+    background: #fff;
+  }
+  header h1{
+    margin: 0 0 2px;
+    font-size: 20px;
+    letter-spacing: -0.2px;
+  }
+  header p{
+    margin:0;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .filters{
+    display:flex;
+    gap:8px;
+    padding: 12px 18px;
+    overflow-x:auto;
+    background:#fff;
+    border-bottom: 1px solid var(--line);
+  }
+  .filters button{
+    flex: none;
+    border: 1px solid var(--line);
+    background:#fff;
+    color: var(--ink-soft);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor:pointer;
+  }
+  .filters button.active{
+    background: var(--ink);
+    border-color: var(--ink);
+    color:#fff;
+  }
+  #list{ padding: 14px 18px 100px; display:flex; flex-direction:column; gap:10px; }
+  .job{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+    cursor:pointer;
+  }
+  .job .row{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .job h3{ margin:0 0 4px; font-size:15px; }
+  .job .meta{ font-size:12px; color: var(--ink-soft); }
+  .job .pay{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .job .tags{ margin-top:8px; display:flex; gap:6px; flex-wrap:wrap; }
+  .job .tag{
+    font-size: 11px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+
+  /* Detail overlay */
+  #detail{
+    position:fixed; inset:0;
+    background: var(--paper);
+    transform: translateX(100%);
+    transition: transform .22s ease;
+    overflow-y:auto;
+    z-index: 10;
+  }
+  #detail.open{ transform: translateX(0); }
+  #detail .top{
+    padding: 16px 18px;
+    background:#fff;
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:12px;
+  }
+  #detail .top button{
+    border:none; background:none; font-size:20px; cursor:pointer; color:var(--ink);
+    padding:0 4px;
+  }
+  #detail .body{ padding: 18px; }
+  #detail h2{ margin:0 0 6px; font-size: 19px; }
+  #detail .meta-line{ font-size:13px; color:var(--ink-soft); margin-bottom:14px; }
+  #detail .pay-box{
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-weight:600;
+    display:inline-block;
+    margin-bottom:16px;
+  }
+  #detail .desc{ font-size:14px; line-height:1.55; color:var(--ink); white-space:pre-line; }
+
+  /* Apply form */
+  #applyBar{
+    position:fixed; left:0; right:0; bottom:0;
+    background:#fff; border-top:1px solid var(--line);
+    padding: 12px 18px; z-index: 11;
+  }
+  #applyBar button{
+    width:100%; padding: 13px; border:none; border-radius:9px;
+    background: var(--accent); color:#fff; font-size:15px; font-weight:600; cursor:pointer;
+  }
+  #applyForm{
+    position:fixed; inset:0; background: rgba(20,33,61,.4);
+    display:none; align-items:flex-end; z-index:20;
+  }
+  #applyForm.open{ display:flex; }
+  #applyForm .sheet{
+    background:#fff; width:100%; border-radius: 16px 16px 0 0;
+    padding: 20px 18px 24px; max-height: 80vh; overflow-y:auto;
+  }
+  #applyForm h3{ margin:0 0 14px; font-size:17px; }
+  #applyForm label{ font-size:12px; color:var(--ink-soft); display:block; margin: 12px 0 4px; }
+  #applyForm input, #applyForm textarea{
+    width:100%; border:1px solid var(--line); border-radius:8px; padding:10px;
+    font-size:14px; font-family:inherit; resize:vertical;
+  }
+  #applyForm .send{
+    margin-top:18px; width:100%; padding:13px; border:none; border-radius:9px;
+    background: var(--ink); color:#fff; font-size:15px; font-weight:600; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Overseas Jobs</h1>
+  <p>Vacancies abroad, updated weekly</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div id="list"></div>
+
+<div id="detail">
+  <div class="top">
+    <button id="back">←</button>
+    <strong>Job details</strong>
+  </div>
+  <div class="body" id="detailBody"></div>
+  <div id="applyBar"><button id="applyBtn">Apply now</button></div>
+</div>
+
+<div id="applyForm">
+  <div class="sheet">
+    <h3>Send application</h3>
+    <label>Full name</label>
+    <input id="fName" type="text" placeholder="Your name">
+    <label>Contact (phone or email)</label>
+    <input id="fContact" type="text" placeholder="+1 555 000 0000 or you@email.com">
+    <label>Message (optional)</label>
+    <textarea id="fMessage" rows="3" placeholder="Anything you'd like us to know"></textarea>
+    <button class="send" id="fSend">Send application</button>
+  </div>
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+// Replace with your real vacancies
+const JOBS = [
+  { id:'j1', title:'Warehouse Operative', country:'Germany', category:'Logistics',
+    pay:'€2,100/mo', tags:['Accommodation provided','No experience needed'],
+    desc:'Full-time warehouse role in a logistics hub near Berlin.\n\nDuties: picking, packing, loading.\nContract: 6 months, extendable.\nAccommodation and transport to work included.' },
+  { id:'j2', title:'Hotel Housekeeper', country:'Malta', category:'Hospitality',
+    pay:'€1,650/mo', tags:['Seasonal','Meals included'],
+    desc:'Seasonal housekeeping position at a beachfront hotel.\n\nDuties: room cleaning, laundry support.\nContract: April–October.\nMeals and staff housing included.' },
+  { id:'j3', title:'CNC Machine Operator', country:'Poland', category:'Manufacturing',
+    pay:'€1,900/mo', tags:['Training provided'],
+    desc:'Factory role operating CNC milling machines.\n\nDuties: machine setup, quality checks.\nContract: 12 months.\nOn-site training provided in the first two weeks.' },
+];
+
+const CATEGORIES = ['All', ...new Set(JOBS.map(j => j.category))];
+let activeCategory = 'All';
+let currentJob = null;
+
+const filtersEl = document.getElementById('filters');
+const listEl = document.getElementById('list');
+const detailEl = document.getElementById('detail');
+const detailBody = document.getElementById('detailBody');
+const applyForm = document.getElementById('applyForm');
+
+function renderFilters(){
+  filtersEl.innerHTML = '';
+  CATEGORIES.forEach(cat => {
+    const b = document.createElement('button');
+    b.textContent = cat;
+    if (cat === activeCategory) b.classList.add('active');
+    b.onclick = () => { activeCategory = cat; renderFilters(); renderList(); };
+    filtersEl.appendChild(b);
+  });
+}
+
+function renderList(){
+  listEl.innerHTML = '';
+  const jobs = activeCategory === 'All' ? JOBS : JOBS.filter(j => j.category === activeCategory);
+  jobs.forEach(j => {
+    const el = document.createElement('div');
+    el.className = 'job';
+    el.innerHTML = `
+      <div class="row">
+        <div>
+          <h3>${j.title}</h3>
+          <div class="meta">${j.country} · ${j.category}</div>
+        </div>
+        <div class="pay">${j.pay}</div>
+      </div>
+      <div class="tags">${j.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+    `;
+    el.onclick = () => openDetail(j);
+    listEl.appendChild(el);
+  });
+}
+
+function openDetail(job){
+  currentJob = job;
+  detailBody.innerHTML = `
+    <h2>${job.title}</h2>
+    <div class="meta-line">${job.country} · ${job.category}</div>
+    <div class="pay-box">${job.pay}</div>
+    <div class="desc">${job.desc}</div>
+  `;
+  detailEl.classList.add('open');
+}
+
+document.getElementById('back').onclick = () => detailEl.classList.remove('open');
+document.getElementById('applyBtn').onclick = () => applyForm.classList.add('open');
+
+document.getElementById('fSend').onclick = () => {
+  const name = document.getElementById('fName').value.trim();
+  const contact = document.getElementById('fContact').value.trim();
+  const message = document.getElementById('fMessage').value.trim();
+
+  if (!name || !contact) {
+    alert('Please fill in your name and contact.');
+    return;
+  }
+
+  const payload = JSON.stringify({
+    type: 'application',
+    jobId: currentJob.id,
+    jobTitle: currentJob.title,
+    name, contact, message
+  });
+
+  if (tg) {
+    tg.sendData(payload);
+  } else {
+    alert('Application (demo, outside Telegram):\n' + payload);
+  }
+  applyForm.classList.remove('open');
+};
+
+renderFilters();
+renderList();
+</script>
+
+</body>
+</html>
