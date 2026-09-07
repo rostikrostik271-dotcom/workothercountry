@@ -2,93 +2,120 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-<title>Overseas Jobs</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OVERSEAS JOBS</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink: #14213d;
-    --ink-soft: #4a5578;
-    --line: #dfe3ec;
-    --paper: #f6f7fb;
-    --accent: #1d5b46;
-    --accent-soft: #e4efe9;
+    --black: #0d0d0b;
+    --panel: #17170f;
+    --khaki: #a8a06a;
+    --khaki-dim: #6f6a48;
+    --off-white: #ece8dd;
+    --line: #2c2b22;
+    --danger: #c4553f;
   }
   *{ box-sizing: border-box; }
   body{
     margin:0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--black);
+    color: var(--off-white);
+    font-family: 'Oswald', sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
   header{
-    padding: 22px 18px 16px;
-    border-bottom: 1px solid var(--line);
-    background: #fff;
+    padding: 26px 18px 18px;
+    border-bottom: 2px solid var(--khaki);
   }
   header h1{
-    margin: 0 0 2px;
-    font-size: 20px;
-    letter-spacing: -0.2px;
+    margin:0 0 4px;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 26px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--off-white);
   }
   header p{
     margin:0;
-    font-size: 13px;
-    color: var(--ink-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--khaki);
   }
   .filters{
     display:flex;
     gap:8px;
-    padding: 12px 18px;
+    padding: 14px 18px;
     overflow-x:auto;
-    background:#fff;
     border-bottom: 1px solid var(--line);
   }
   .filters button{
     flex: none;
-    border: 1px solid var(--line);
-    background:#fff;
-    color: var(--ink-soft);
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 13px;
+    border: 1px solid var(--khaki-dim);
+    background: transparent;
+    color: var(--khaki);
+    padding: 7px 14px;
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
     cursor:pointer;
   }
   .filters button.active{
-    background: var(--ink);
-    border-color: var(--ink);
-    color:#fff;
+    background: var(--khaki);
+    border-color: var(--khaki);
+    color: var(--black);
+    font-weight: 600;
   }
-  #list{ padding: 14px 18px 100px; display:flex; flex-direction:column; gap:10px; }
+  #list{ padding: 16px 18px 100px; display:flex; flex-direction:column; gap:10px; }
   .job{
-    background:#fff;
+    background: var(--panel);
     border:1px solid var(--line);
-    border-radius: 10px;
-    padding: 14px;
+    border-left: 3px solid var(--khaki);
+    padding: 14px 16px;
     cursor:pointer;
   }
   .job .row{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-  .job h3{ margin:0 0 4px; font-size:15px; }
-  .job .meta{ font-size:12px; color: var(--ink-soft); }
+  .job h3{
+    margin:0 0 4px;
+    font-size:16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .job .meta{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--khaki-dim);
+    letter-spacing: 0.5px;
+  }
   .job .pay{
+    font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
     font-weight: 600;
-    color: var(--accent);
+    color: var(--khaki);
     white-space: nowrap;
   }
-  .job .tags{ margin-top:8px; display:flex; gap:6px; flex-wrap:wrap; }
+  .job .tags{ margin-top:10px; display:flex; gap:6px; flex-wrap:wrap; }
   .job .tag{
-    font-size: 11px;
-    background: var(--accent-soft);
-    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border: 1px solid var(--khaki-dim);
+    color: var(--khaki);
     padding: 3px 8px;
-    border-radius: 6px;
+    border-radius: 2px;
   }
 
   /* Detail overlay */
   #detail{
     position:fixed; inset:0;
-    background: var(--paper);
+    background: var(--black);
     transform: translateX(100%);
     transition: transform .22s ease;
     overflow-y:auto;
@@ -96,57 +123,95 @@
   }
   #detail.open{ transform: translateX(0); }
   #detail .top{
-    padding: 16px 18px;
-    background:#fff;
-    border-bottom:1px solid var(--line);
+    padding: 18px;
+    border-bottom:2px solid var(--khaki);
     display:flex; align-items:center; gap:12px;
   }
   #detail .top button{
-    border:none; background:none; font-size:20px; cursor:pointer; color:var(--ink);
-    padding:0 4px;
+    border: 1px solid var(--khaki-dim);
+    background:none;
+    font-size:16px;
+    cursor:pointer;
+    color: var(--khaki);
+    padding: 4px 10px;
+    font-family: 'JetBrains Mono', monospace;
   }
-  #detail .body{ padding: 18px; }
-  #detail h2{ margin:0 0 6px; font-size: 19px; }
-  #detail .meta-line{ font-size:13px; color:var(--ink-soft); margin-bottom:14px; }
+  #detail .top strong{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--khaki-dim);
+  }
+  #detail .body{ padding: 20px 18px; }
+  #detail h2{
+    margin:0 0 8px;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 21px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  #detail .meta-line{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--khaki-dim);
+    margin-bottom:16px;
+    letter-spacing: 0.5px;
+  }
   #detail .pay-box{
-    background: var(--accent-soft);
-    color: var(--accent);
+    background: var(--khaki);
+    color: var(--black);
     padding: 10px 14px;
-    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
     font-weight:600;
     display:inline-block;
-    margin-bottom:16px;
+    margin-bottom:18px;
+    letter-spacing: 0.5px;
   }
-  #detail .desc{ font-size:14px; line-height:1.55; color:var(--ink); white-space:pre-line; }
+  #detail .desc{ font-size:14px; line-height:1.6; color: var(--off-white); white-space:pre-line; }
 
   /* Apply form */
   #applyBar{
     position:fixed; left:0; right:0; bottom:0;
-    background:#fff; border-top:1px solid var(--line);
+    background: var(--black); border-top:2px solid var(--khaki);
     padding: 12px 18px; z-index: 11;
   }
   #applyBar button{
-    width:100%; padding: 13px; border:none; border-radius:9px;
-    background: var(--accent); color:#fff; font-size:15px; font-weight:600; cursor:pointer;
+    width:100%; padding: 14px; border: none;
+    background: var(--khaki); color: var(--black);
+    font-family: 'JetBrains Mono', monospace;
+    font-size:13px; font-weight:600; letter-spacing: 1px; text-transform: uppercase;
+    cursor:pointer;
   }
   #applyForm{
-    position:fixed; inset:0; background: rgba(20,33,61,.4);
+    position:fixed; inset:0; background: rgba(0,0,0,.75);
     display:none; align-items:flex-end; z-index:20;
   }
   #applyForm.open{ display:flex; }
   #applyForm .sheet{
-    background:#fff; width:100%; border-radius: 16px 16px 0 0;
-    padding: 20px 18px 24px; max-height: 80vh; overflow-y:auto;
+    background: var(--panel); width:100%; border-top: 2px solid var(--khaki);
+    padding: 22px 18px 26px; max-height: 80vh; overflow-y:auto;
   }
-  #applyForm h3{ margin:0 0 14px; font-size:17px; }
-  #applyForm label{ font-size:12px; color:var(--ink-soft); display:block; margin: 12px 0 4px; }
+  #applyForm h3{
+    margin:0 0 16px; font-family: 'Archivo Black', sans-serif;
+    font-size:16px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  #applyForm label{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--khaki-dim); display:block; margin: 14px 0 5px;
+  }
   #applyForm input, #applyForm textarea{
-    width:100%; border:1px solid var(--line); border-radius:8px; padding:10px;
-    font-size:14px; font-family:inherit; resize:vertical;
+    width:100%; background: var(--black); border:1px solid var(--line); color: var(--off-white);
+    padding:11px; font-size:14px; font-family: 'Oswald', sans-serif; resize:vertical;
   }
+  #applyForm input:focus, #applyForm textarea:focus{ outline:none; border-color: var(--khaki); }
   #applyForm .send{
-    margin-top:18px; width:100%; padding:13px; border:none; border-radius:9px;
-    background: var(--ink); color:#fff; font-size:15px; font-weight:600; cursor:pointer;
+    margin-top:20px; width:100%; padding:14px; border: none;
+    background: var(--khaki); color: var(--black);
+    font-family: 'JetBrains Mono', monospace;
+    font-size:13px; font-weight:600; letter-spacing: 1px; text-transform: uppercase;
+    cursor:pointer;
   }
 </style>
 </head>
@@ -154,7 +219,7 @@
 
 <header>
   <h1>Overseas Jobs</h1>
-  <p>Vacancies abroad, updated weekly</p>
+  <p>Vacancies abroad — updated weekly</p>
 </header>
 
 <div class="filters" id="filters"></div>
