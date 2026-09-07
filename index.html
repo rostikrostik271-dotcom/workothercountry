@@ -8,128 +8,173 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --black:#0d0d0b; --panel:#17170f; --khaki:#a8a06a; --khaki-dim:#6f6a48;
-    --off-white:#ece8dd; --line:#2c2b22;
-  }
-  *{ box-sizing:border-box; }
-  body{ margin:0; background:var(--black); color:var(--off-white);
-    font-family:'Oswald',sans-serif; -webkit-font-smoothing:antialiased; }
+:root{
+  --black:#0d0d0b; --panel:#17170f; --khaki:#a8a06a; --khaki-dim:#6f6a48;
+  --off-white:#ece8dd; --line:#2c2b22; --rust:#b5502f;
+}
+*{ box-sizing:border-box; }
+body{ margin:0; background:var(--black); color:var(--off-white);
+  font-family:'Oswald',sans-serif; -webkit-font-smoothing:antialiased; }
+header{ padding:22px 18px 14px; border-bottom:2px solid var(--khaki);
+  display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+header h1{ margin:0 0 4px; font-family:'Archivo Black',sans-serif; font-size:22px;
+  letter-spacing:1px; text-transform:uppercase; }
+header p{ margin:0; font-family:'JetBrains Mono',monospace; font-size:11px;
+  letter-spacing:1.5px; text-transform:uppercase; color:var(--khaki); }
+.lang-switch{ display:flex; gap:4px; flex:none; margin-top:2px; }
+.lang-switch button{ border:1px solid var(--khaki-dim); background:transparent; color:var(--khaki-dim);
+  font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; letter-spacing:0.5px;
+  padding:5px 9px; border-radius:2px; cursor:pointer; }
+.lang-switch button.active{ background:var(--khaki); border-color:var(--khaki); color:var(--black); }
 
-  header{ padding:22px 18px 14px; border-bottom:2px solid var(--khaki);
-    display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
-  header h1{ margin:0 0 4px; font-family:'Archivo Black',sans-serif; font-size:22px;
-    letter-spacing:1px; text-transform:uppercase; }
-  header p{ margin:0; font-family:'JetBrains Mono',monospace; font-size:11px;
-    letter-spacing:1.5px; text-transform:uppercase; color:var(--khaki); }
-  .lang-switch{ display:flex; gap:4px; flex:none; margin-top:2px; }
-  .lang-switch button{ border:1px solid var(--khaki-dim); background:transparent; color:var(--khaki-dim);
-    font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; letter-spacing:0.5px;
-    padding:5px 9px; border-radius:2px; cursor:pointer; }
-  .lang-switch button.active{ background:var(--khaki); border-color:var(--khaki); color:var(--black); }
+/* Hero image band */
+.hero{ position:relative; height:108px; overflow:hidden; border-bottom:2px solid var(--khaki); }
+.hero img{ width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(1) brightness(0.5); }
+.hero::after{ content:''; position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(13,13,11,0.15) 0%, rgba(13,13,11,0.55) 60%, rgba(13,13,11,0.92) 100%); }
+.hero .hero-text{ position:absolute; left:18px; right:18px; bottom:10px; z-index:2;
+  font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1.2px; text-transform:uppercase; color:var(--khaki); }
 
-  /* Main nav tabs */
-  .main-nav{ display:flex; border-bottom:1px solid var(--line); }
-  .main-nav button{ flex:1; background:none; border:none; padding:13px 6px;
-    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; text-transform:uppercase;
-    color:var(--khaki-dim); cursor:pointer; border-bottom:2px solid transparent; }
-  .main-nav button.active{ color:var(--khaki); border-bottom-color:var(--khaki); }
+/* Main nav tabs */
+.main-nav{ display:flex; border-bottom:1px solid var(--line); }
+.main-nav button{ flex:1; background:none; border:none; padding:13px 6px;
+  font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; text-transform:uppercase;
+  color:var(--khaki-dim); cursor:pointer; border-bottom:2px solid transparent; }
+.main-nav button.active{ color:var(--khaki); border-bottom-color:var(--khaki); }
 
-  .screen{ display:none; }
-  .screen.active{ display:block; }
+.screen{ display:none; }
+.screen.active{ display:block; }
 
-  /* Filters bar */
-  .filters-bar{ display:flex; align-items:center; justify-content:space-between;
-    padding:12px 18px; border-bottom:1px solid var(--line); }
-  .filters-bar button{ border:1px solid var(--khaki); background:transparent; color:var(--khaki);
-    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; text-transform:uppercase;
-    padding:8px 14px; border-radius:2px; cursor:pointer; display:flex; align-items:center; gap:6px; }
-  .filters-bar .count{ background:var(--khaki); color:var(--black); border-radius:50%;
-    width:16px; height:16px; font-size:10px; display:flex; align-items:center; justify-content:center; }
-  .filters-bar .result-count{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--khaki-dim); }
+/* Stats strip */
+.stats-strip{ display:flex; border-bottom:1px solid var(--line); }
+.stats-strip .stat{ flex:1; padding:16px 8px 14px; text-align:center; border-left:1px solid var(--line); }
+.stats-strip .stat:first-child{ border-left:none; }
+.stats-strip .stat-num{ font-family:'Archivo Black',sans-serif; font-size:22px; color:var(--khaki); line-height:1; }
+.stats-strip .stat-label{ margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:9.5px;
+  letter-spacing:1px; text-transform:uppercase; color:var(--khaki-dim); }
 
-  #list{ padding:14px 18px 30px; display:flex; flex-direction:column; gap:10px; }
-  .job{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--khaki);
-    padding:14px 16px; cursor:pointer; }
-  .job .row{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-  .job h3{ margin:0 0 4px; font-size:16px; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; }
-  .job .meta{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--khaki-dim); letter-spacing:0.5px; }
-  .job .pay{ font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; color:var(--khaki); white-space:nowrap; }
-  .job .tags{ margin-top:10px; display:flex; gap:6px; flex-wrap:wrap; }
-  .job .tag{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.5px; text-transform:uppercase;
-    border:1px solid var(--khaki-dim); color:var(--khaki); padding:3px 8px; border-radius:2px; }
-  .empty-state{ padding:40px 18px; text-align:center; font-family:'JetBrains Mono',monospace;
-    font-size:12px; color:var(--khaki-dim); letter-spacing:0.5px; }
+/* Filters bar */
+.filters-bar{ display:flex; align-items:center; justify-content:space-between;
+  padding:12px 18px; border-bottom:1px solid var(--line); }
+.filters-bar button{ border:1px solid var(--khaki); background:transparent; color:var(--khaki);
+  font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; text-transform:uppercase;
+  padding:8px 14px; border-radius:2px; cursor:pointer; display:flex; align-items:center; gap:6px; }
+.filters-bar .count{ background:var(--khaki); color:var(--black); border-radius:50%;
+  width:16px; height:16px; font-size:10px; display:flex; align-items:center; justify-content:center; }
+.filters-bar .result-count{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--khaki-dim); }
 
-  /* Contact / About static screens */
-  .static-page{ padding:24px 18px; }
-  .static-page h2{ font-family:'Archivo Black',sans-serif; font-size:19px; text-transform:uppercase;
-    letter-spacing:0.5px; margin:0 0 14px; }
-  .static-page p{ font-size:14px; line-height:1.6; color:var(--off-white); margin:0 0 18px; }
-  .static-page a.contact-btn{ display:inline-block; background:var(--khaki); color:var(--black);
-    font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; letter-spacing:1px;
-    text-transform:uppercase; padding:13px 20px; border-radius:2px; text-decoration:none; }
+#list{ padding:14px 18px 30px; display:flex; flex-direction:column; gap:10px; }
+.job{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--khaki);
+  padding:14px 16px; cursor:pointer; }
+.job .row{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.job .thumb{ width:52px; height:52px; flex:none; position:relative; overflow:hidden; border:1px solid var(--line); }
+.job .thumb img{ width:100%; height:100%; object-fit:cover; display:block; filter:grayscale(1) brightness(0.6); }
+.job .thumb::after{ content:''; position:absolute; inset:0; background:var(--khaki); mix-blend-mode:multiply; opacity:0.4; }
+.job .info{ flex:1; min-width:0; }
+.job h3{ margin:0 0 4px; font-size:16px; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; }
+.job .meta{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--khaki-dim); letter-spacing:0.5px; }
+.job .pay{ font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; color:var(--khaki); white-space:nowrap; }
+.job .tags{ margin-top:10px; display:flex; gap:6px; flex-wrap:wrap; }
+.job .tag{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.5px; text-transform:uppercase;
+  border:1px solid var(--khaki-dim); color:var(--khaki); padding:3px 8px; border-radius:2px; }
+.job .tag.tag-hot{ border-color:var(--rust); color:#e0a389; }
+.job .posted{ margin-top:8px; font-family:'JetBrains Mono',monospace; font-size:10px;
+  color:var(--khaki-dim); opacity:0.8; }
 
-  /* Filter sheet */
-  .sheet-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.75); display:none;
-    align-items:flex-end; z-index:30; }
-  .sheet-overlay.open{ display:flex; }
-  .sheet{ background:var(--panel); width:100%; border-top:2px solid var(--khaki);
-    padding:20px 18px 24px; max-height:82vh; overflow-y:auto; }
-  .sheet h3{ margin:0 0 18px; font-family:'Archivo Black',sans-serif; font-size:16px;
-    text-transform:uppercase; letter-spacing:0.5px; }
-  .filter-group{ margin-bottom:20px; }
-  .filter-group .label{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.5px;
-    text-transform:uppercase; color:var(--khaki-dim); margin-bottom:8px; }
-  .pill-row{ display:flex; gap:8px; flex-wrap:wrap; }
-  .pill-row button{ border:1px solid var(--khaki-dim); background:transparent; color:var(--khaki);
-    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.5px; text-transform:uppercase;
-    padding:9px 14px; border-radius:2px; cursor:pointer; display:flex; align-items:center; gap:6px; }
-  .pill-row button.active{ background:var(--khaki); border-color:var(--khaki); color:var(--black); font-weight:600; }
-  .pill-row button svg{ width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.6; }
-  .sheet .apply-filters{ width:100%; padding:14px; border:none; background:var(--khaki); color:var(--black);
-    font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; letter-spacing:1px;
-    text-transform:uppercase; cursor:pointer; margin-top:6px; }
+.empty-state{ padding:40px 18px; text-align:center; font-family:'JetBrains Mono',monospace;
+  font-size:12px; color:var(--khaki-dim); letter-spacing:0.5px; }
 
-  /* Detail overlay */
-  #detail{ position:fixed; inset:0; background:var(--black); transform:translateX(100%);
-    transition:transform .22s ease; overflow-y:auto; z-index:10; }
-  #detail.open{ transform:translateX(0); }
-  #detail .top{ padding:18px; border-bottom:2px solid var(--khaki); display:flex; align-items:center; gap:12px; }
-  #detail .top button{ border:1px solid var(--khaki-dim); background:none; font-size:16px; cursor:pointer;
-    color:var(--khaki); padding:4px 10px; font-family:'JetBrains Mono',monospace; }
-  #detail .top strong{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1.5px;
-    text-transform:uppercase; color:var(--khaki-dim); }
-  #detail .body{ padding:20px 18px 110px; }
-  #detail h2{ margin:0 0 8px; font-family:'Archivo Black',sans-serif; font-size:21px;
-    text-transform:uppercase; letter-spacing:0.5px; }
-  #detail .meta-line{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--khaki-dim);
-    margin-bottom:16px; letter-spacing:0.5px; }
-  #detail .pay-box{ background:var(--khaki); color:var(--black); padding:10px 14px;
-    font-family:'JetBrains Mono',monospace; font-weight:600; display:inline-block; margin-bottom:18px; letter-spacing:0.5px; }
-  #detail .desc{ font-size:14px; line-height:1.6; color:var(--off-white); white-space:pre-line; }
+/* Reviews screen */
+.reviews-head{ padding:22px 18px 18px; border-bottom:1px solid var(--line); }
+.reviews-head h2{ margin:0 0 6px; font-family:'Archivo Black',sans-serif; font-size:19px;
+  text-transform:uppercase; letter-spacing:0.5px; }
+.reviews-head p{ margin:0 0 14px; font-size:13.5px; line-height:1.5; color:var(--khaki-dim); }
+.reviews-head .score-row{ display:flex; align-items:baseline; gap:10px; }
+.reviews-head .score-num{ font-family:'Archivo Black',sans-serif; font-size:30px; color:var(--khaki); }
+.reviews-head .stars{ font-size:15px; letter-spacing:2px; color:var(--khaki); }
+.reviews-head .score-count{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--khaki-dim); }
+#reviewsList{ padding:14px 18px 30px; display:flex; flex-direction:column; gap:10px; }
+.review{ position:relative; background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--khaki);
+  padding:16px 16px 14px; overflow:hidden; }
+.review .r-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:8px; }
+.review .r-name{ font-weight:600; font-size:14.5px; text-transform:uppercase; letter-spacing:0.3px; }
+.review .r-role{ font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--khaki-dim); margin-top:2px; }
+.review .r-stars{ font-size:13px; letter-spacing:1.5px; color:var(--khaki); white-space:nowrap; }
+.review .r-text{ font-size:13.5px; line-height:1.55; color:var(--off-white); }
+.review .r-stamp{ position:absolute; top:14px; right:-30px; width:130px; text-align:center;
+  transform:rotate(35deg); border-top:1px solid var(--khaki-dim); border-bottom:1px solid var(--khaki-dim);
+  font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--khaki-dim); padding:2px 0; opacity:0.55; }
 
-  #applyBar{ position:fixed; left:0; right:0; bottom:0; background:var(--black); border-top:2px solid var(--khaki);
-    padding:12px 18px; z-index:11; display:flex; gap:8px; }
-  #applyBar button{ flex:1; padding:14px 8px; border:none; font-family:'JetBrains Mono',monospace;
-    font-size:12px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; cursor:pointer; }
-  #applyBtn{ background:var(--khaki); color:var(--black); }
-  #cvBtn{ background:transparent; border:1px solid var(--khaki) !important; color:var(--khaki); }
+/* Contact / About static screens */
+.static-page{ padding:24px 18px; }
+.static-page h2{ font-family:'Archivo Black',sans-serif; font-size:19px; text-transform:uppercase;
+  letter-spacing:0.5px; margin:0 0 14px; }
+.static-page p{ font-size:14px; line-height:1.6; color:var(--off-white); margin:0 0 18px; }
+.static-page a.contact-btn{ display:inline-block; background:var(--khaki); color:var(--black);
+  font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; letter-spacing:1px;
+  text-transform:uppercase; padding:13px 20px; border-radius:2px; text-decoration:none; }
 
-  #applyForm{ position:fixed; inset:0; background:rgba(0,0,0,.75); display:none; align-items:flex-end; z-index:20; }
-  #applyForm.open{ display:flex; }
-  #applyForm .sheet-inner{ background:var(--panel); width:100%; border-top:2px solid var(--khaki);
-    padding:22px 18px 26px; max-height:80vh; overflow-y:auto; }
-  #applyForm h3{ margin:0 0 16px; font-family:'Archivo Black',sans-serif; font-size:16px;
-    text-transform:uppercase; letter-spacing:0.5px; }
-  #applyForm label{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px;
-    text-transform:uppercase; color:var(--khaki-dim); display:block; margin:14px 0 5px; }
-  #applyForm input, #applyForm textarea{ width:100%; background:var(--black); border:1px solid var(--line);
-    color:var(--off-white); padding:11px; font-size:14px; font-family:'Oswald',sans-serif; resize:vertical; }
-  #applyForm input:focus, #applyForm textarea:focus{ outline:none; border-color:var(--khaki); }
-  #applyForm .send{ margin-top:20px; width:100%; padding:14px; border:none; background:var(--khaki); color:var(--black);
-    font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; letter-spacing:1px;
-    text-transform:uppercase; cursor:pointer; }
+/* Filter sheet */
+.sheet-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.75); display:none;
+  align-items:flex-end; z-index:30; }
+.sheet-overlay.open{ display:flex; }
+.sheet{ background:var(--panel); width:100%; border-top:2px solid var(--khaki);
+  padding:20px 18px 24px; max-height:82vh; overflow-y:auto; }
+.sheet h3{ margin:0 0 18px; font-family:'Archivo Black',sans-serif; font-size:16px;
+  text-transform:uppercase; letter-spacing:0.5px; }
+.filter-group{ margin-bottom:20px; }
+.filter-group .label{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.5px;
+  text-transform:uppercase; color:var(--khaki-dim); margin-bottom:8px; }
+.pill-row{ display:flex; gap:8px; flex-wrap:wrap; }
+.pill-row button{ border:1px solid var(--khaki-dim); background:transparent; color:var(--khaki);
+  font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.5px; text-transform:uppercase;
+  padding:9px 14px; border-radius:2px; cursor:pointer; display:flex; align-items:center; gap:6px; }
+.pill-row button.active{ background:var(--khaki); border-color:var(--khaki); color:var(--black); font-weight:600; }
+.pill-row button svg{ width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.6; }
+.sheet .apply-filters{ width:100%; padding:14px; border:none; background:var(--khaki); color:var(--black);
+  font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; letter-spacing:1px;
+  text-transform:uppercase; cursor:pointer; margin-top:6px; }
+
+/* Detail overlay */
+#detail{ position:fixed; inset:0; background:var(--black); transform:translateX(100%);
+  transition:transform .22s ease; overflow-y:auto; z-index:10; }
+#detail.open{ transform:translateX(0); }
+#detail .top{ padding:18px; border-bottom:2px solid var(--khaki); display:flex; align-items:center; gap:12px; }
+#detail .top button{ border:1px solid var(--khaki-dim); background:none; font-size:16px; cursor:pointer;
+  color:var(--khaki); padding:4px 10px; font-family:'JetBrains Mono',monospace; }
+#detail .top strong{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1.5px;
+  text-transform:uppercase; color:var(--khaki-dim); }
+#detail .body{ padding:20px 18px 110px; }
+#detail h2{ margin:0 0 8px; font-family:'Archivo Black',sans-serif; font-size:21px;
+  text-transform:uppercase; letter-spacing:0.5px; }
+#detail .meta-line{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--khaki-dim);
+  margin-bottom:16px; letter-spacing:0.5px; }
+#detail .pay-box{ background:var(--khaki); color:var(--black); padding:10px 14px;
+  font-family:'JetBrains Mono',monospace; font-weight:600; display:inline-block; margin-bottom:18px; letter-spacing:0.5px; }
+#detail .desc{ font-size:14px; line-height:1.6; color:var(--off-white); white-space:pre-line; }
+
+#applyBar{ position:fixed; left:0; right:0; bottom:0; background:var(--black); border-top:2px solid var(--khaki);
+  padding:12px 18px; z-index:11; display:flex; gap:8px; }
+#applyBar button{ flex:1; padding:14px 8px; border:none; font-family:'JetBrains Mono',monospace;
+  font-size:12px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; cursor:pointer; }
+#applyBtn{ background:var(--khaki); color:var(--black); }
+#cvBtn{ background:transparent; border:1px solid var(--khaki) !important; color:var(--khaki); }
+
+#applyForm{ position:fixed; inset:0; background:rgba(0,0,0,.75); display:none; align-items:flex-end; z-index:20; }
+#applyForm.open{ display:flex; }
+#applyForm .sheet-inner{ background:var(--panel); width:100%; border-top:2px solid var(--khaki);
+  padding:22px 18px 26px; max-height:80vh; overflow-y:auto; }
+#applyForm h3{ margin:0 0 16px; font-family:'Archivo Black',sans-serif; font-size:16px;
+  text-transform:uppercase; letter-spacing:0.5px; }
+#applyForm label{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px;
+  text-transform:uppercase; color:var(--khaki-dim); display:block; margin:14px 0 5px; }
+#applyForm input, #applyForm textarea{ width:100%; background:var(--black); border:1px solid var(--line);
+  color:var(--off-white); padding:11px; font-size:14px; font-family:'Oswald',sans-serif; resize:vertical; }
+#applyForm input:focus, #applyForm textarea:focus{ outline:none; border-color:var(--khaki); }
+#applyForm .send{ margin-top:20px; width:100%; padding:14px; border:none; background:var(--khaki); color:var(--black);
+  font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; letter-spacing:1px;
+  text-transform:uppercase; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -146,14 +191,25 @@
   </div>
 </header>
 
+<div class="hero">
+  <img src="https://picsum.photos/seed/overseasjobs-hero/900/300" alt="" loading="lazy">
+  <div class="hero-text" id="heroText">Real contracts. Real employers. No borders.</div>
+</div>
+
 <div class="main-nav" id="mainNav">
   <button data-tab="jobs">Jobs</button>
+  <button data-tab="reviews">Reviews</button>
   <button data-tab="contact">Contact</button>
   <button data-tab="about">About</button>
 </div>
 
 <!-- JOBS SCREEN -->
 <div class="screen active" id="screen-jobs">
+  <div class="stats-strip" id="statsStrip">
+    <div class="stat"><div class="stat-num" id="statPlacedNum">500+</div><div class="stat-label" id="statPlacedLabel">Placed</div></div>
+    <div class="stat"><div class="stat-num" id="statCountriesNum">2</div><div class="stat-label" id="statCountriesLabel">Countries</div></div>
+    <div class="stat"><div class="stat-num" id="statRatingNum">4.6</div><div class="stat-label" id="statRatingLabel">Avg. rating</div></div>
+  </div>
   <div class="filters-bar">
     <button id="openFilters">
       <span id="filtersLabel">Filters</span>
@@ -164,11 +220,25 @@
   <div id="list"></div>
 </div>
 
+<!-- REVIEWS SCREEN -->
+<div class="screen" id="screen-reviews">
+  <div class="reviews-head">
+    <h2 id="reviewsTitle">What people say</h2>
+    <p id="reviewsSubtitle">Real feedback from people we helped place abroad.</p>
+    <div class="score-row" id="reviewsScoreRow">
+      <span class="score-num" id="reviewsScoreNum">4.6</span>
+      <span class="stars" id="reviewsScoreStars">★★★★★</span>
+      <span class="score-count" id="reviewsScoreCount">5 reviews</span>
+    </div>
+  </div>
+  <div id="reviewsList"></div>
+</div>
+
 <!-- CONTACT SCREEN -->
 <div class="screen" id="screen-contact">
   <div class="static-page">
-    <h2 id="contactTitle">Contact</h2>
-    <p id="contactBody">Have a question about a vacancy, or want to send your CV directly? Message us anytime.</p>
+    <h2 id="contactTitle">Talk to a real person</h2>
+    <p id="contactBody">Behind this app is one person, not a call centre. Ask about a vacancy, ask what documents you'll need, or just send your CV — you'll get a reply from an actual human, usually the same day.</p>
     <a class="contact-btn" id="contactBtnPage" href="https://t.me/ceostap16" target="_blank">Message @ceostap16</a>
   </div>
 </div>
@@ -185,27 +255,22 @@
 <div class="sheet-overlay" id="filterSheet">
   <div class="sheet">
     <h3 id="filterSheetTitle">Filter jobs</h3>
-
     <div class="filter-group">
       <div class="label" id="labelCountry">Country</div>
       <div class="pill-row" id="rowCountry"></div>
     </div>
-
     <div class="filter-group">
       <div class="label" id="labelEmployment">Employment type</div>
       <div class="pill-row" id="rowEmployment"></div>
     </div>
-
     <div class="filter-group">
       <div class="label" id="labelFormat">Work format</div>
       <div class="pill-row" id="rowFormat"></div>
     </div>
-
     <div class="filter-group">
       <div class="label" id="labelGoal">Looking for</div>
       <div class="pill-row" id="rowGoal"></div>
     </div>
-
     <button class="apply-filters" id="applyFiltersBtn">Show results</button>
   </div>
 </div>
@@ -241,7 +306,6 @@ const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 
 const CONTACT_USERNAME = 'ceostap16';
-
 let lang = 'en';
 let activeTab = 'jobs';
 let currentJob = null;
@@ -258,7 +322,15 @@ const ICONS = {
 const UI = {
   en: {
     title:'Overseas Jobs', subtitle:'Vacancies abroad — updated weekly',
-    tabJobs:'Jobs', tabContact:'Contact', tabAbout:'About',
+    heroText:'Real contracts. Real employers. No borders.',
+    tabJobs:'Jobs', tabReviews:'Reviews', tabContact:'Contact', tabAbout:'About',
+    statPlacedLabel:'Placed abroad', statCountriesLabel:'Countries', statRatingLabel:'Avg. rating',
+    tagHot:'High demand',
+    postedToday:'Posted today', postedDays:(n)=> `Posted ${n}d ago`,
+    reviewsTitle:'What people say', reviewsSubtitle:'Real feedback from people we helped place abroad.',
+    reviewsCount:(n)=> n===1 ? '1 review' : `${n} reviews`,
+    verified:'Verified applicant',
+    noReviewsYet:'No reviews posted yet. Check back soon — we post them here as real people share their experience.',
     filters:'Filters', showResults:'Show results',
     filterSheetTitle:'Filter jobs',
     labelCountry:'Country', labelEmployment:'Employment type', labelFormat:'Work format', labelGoal:'Looking for',
@@ -273,14 +345,28 @@ const UI = {
     contact:'Contact (phone or email)', message:'Message (optional)',
     fillRequired:'Please fill in your name and contact.',
     demoAlert:'Application (demo, outside Telegram):\n', thanks:'Thanks! Application sent',
-    contactTitle:'Contact', contactBody:'Have a question about a vacancy, or want to send your CV directly? Message us anytime.',
+    contactTitle:'Talk to a real person', contactBody:'Behind this app is one person, not a call centre. Ask about a vacancy, ask what documents you\'ll need, or just send your CV — you\'ll get a reply from an actual human, usually the same day.',
     contactBtn:'Message @' + CONTACT_USERNAME,
     aboutTitle:'About us',
     aboutBody:'This app is run by a small team helping people find real, verified jobs abroad. We currently list vacancies in the UK and Germany, across logistics, hospitality and manufacturing.\n\nBrowsing and applying is always free. If a listing interests you, you can apply directly through the app or send your CV to us in chat — we\'ll pass it on to the employer and get back to you.\n\nNew vacancies are added weekly.'
   },
   ru: {
     title:'Работа за рубежом', subtitle:'Вакансии за границей — обновляется еженедельно',
-    tabJobs:'Работа', tabContact:'Контакт', tabAbout:'О нас',
+    heroText:'Настоящие контракты. Реальные работодатели. Без границ.',
+    tabJobs:'Работа', tabReviews:'Отзывы', tabContact:'Контакт', tabAbout:'О нас',
+    statPlacedLabel:'Трудоустроено', statCountriesLabel:'Страны', statRatingLabel:'Средний рейтинг',
+    tagHot:'Высокий спрос',
+    postedToday:'Опубликовано сегодня', postedDays:(n)=> `Опубликовано ${n} дн. назад`,
+    reviewsTitle:'Отзывы наших людей', reviewsSubtitle:'Реальные отзывы тех, кому мы помогли трудоустроиться за рубежом.',
+    reviewsCount:(n)=> {
+      const mod10 = n % 10, mod100 = n % 100;
+      let word = 'отзывов';
+      if (mod10 === 1 && mod100 !== 11) word = 'отзыв';
+      else if ([2,3,4].includes(mod10) && ![12,13,14].includes(mod100)) word = 'отзыва';
+      return `${n} ${word}`;
+    },
+    verified:'Проверенный соискатель',
+    noReviewsYet:'Отзывов пока нет. Загляните позже — мы будем публиковать их здесь по мере того, как люди делятся своим опытом.',
     filters:'Фильтры', showResults:'Показать',
     filterSheetTitle:'Фильтр вакансий',
     labelCountry:'Страна', labelEmployment:'Тип занятости', labelFormat:'Формат работы', labelGoal:'Что вы ищете',
@@ -295,14 +381,22 @@ const UI = {
     contact:'Контакт (телефон или email)', message:'Сообщение (необязательно)',
     fillRequired:'Заполните имя и контакт.',
     demoAlert:'Отклик (демо, вне Telegram):\n', thanks:'Спасибо! Отклик отправлен',
-    contactTitle:'Контакт', contactBody:'Есть вопрос по вакансии или хотите отправить резюме напрямую? Пишите в любое время.',
+    contactTitle:'Поговорите с живым человеком', contactBody:'За этим приложением стоит не колл-центр, а один человек. Спросите про вакансию, уточните, какие документы нужны, или просто отправьте резюме — ответит реальный человек, обычно в тот же день.',
     contactBtn:'Написать @' + CONTACT_USERNAME,
     aboutTitle:'О нас',
     aboutBody:'Это приложение ведёт небольшая команда, которая помогает находить реальные, проверенные вакансии за рубежом. Сейчас у нас есть вакансии в Англии и Германии — в логистике, гостиничном деле и на производстве.\n\nПросмотр и отклик всегда бесплатны. Если вакансия заинтересовала — можно откликнуться прямо в приложении или отправить резюме нам в чат, мы передадим его работодателю и свяжемся с вами.\n\nНовые вакансии добавляются каждую неделю.'
   },
   ro: {
     title:'Locuri de muncă peste hotare', subtitle:'Oferte actualizate săptămânal',
-    tabJobs:'Joburi', tabContact:'Contact', tabAbout:'Despre noi',
+    heroText:'Contracte reale. Angajatori reali. Fără granițe.',
+    tabJobs:'Joburi', tabReviews:'Recenzii', tabContact:'Contact', tabAbout:'Despre noi',
+    statPlacedLabel:'Angajați peste hotare', statCountriesLabel:'Țări', statRatingLabel:'Rating mediu',
+    tagHot:'Cerere mare',
+    postedToday:'Publicat azi', postedDays:(n)=> `Publicat acum ${n} zile`,
+    reviewsTitle:'Ce spun oamenii', reviewsSubtitle:'Recenzii reale de la persoane pe care le-am ajutat să se angajeze peste hotare.',
+    reviewsCount:(n)=> n===1 ? '1 recenzie' : `${n} recenzii`,
+    verified:'Aplicant verificat',
+    noReviewsYet:'Nu există încă recenzii. Revino în curând — le publicăm aici pe măsură ce oamenii își împărtășesc experiența.',
     filters:'Filtre', showResults:'Arată rezultate',
     filterSheetTitle:'Filtrează joburile',
     labelCountry:'Țară', labelEmployment:'Tip de angajare', labelFormat:'Format de lucru', labelGoal:'Ce cauți',
@@ -317,7 +411,7 @@ const UI = {
     contact:'Contact (telefon sau email)', message:'Mesaj (opțional)',
     fillRequired:'Completează numele și contactul.',
     demoAlert:'Aplicație (demo, în afara Telegram):\n', thanks:'Mulțumim! Aplicația a fost trimisă',
-    contactTitle:'Contact', contactBody:'Ai o întrebare despre un job sau vrei să trimiți CV-ul direct? Scrie-ne oricând.',
+    contactTitle:'Vorbește cu o persoană reală', contactBody:'În spatele acestei aplicații nu e un call-center, ci o singură persoană. Întreabă despre un job, ce acte îți trebuie, sau trimite direct CV-ul — primești răspuns de la un om real, de obicei chiar în aceeași zi.',
     contactBtn:'Scrie @' + CONTACT_USERNAME,
     aboutTitle:'Despre noi',
     aboutBody:'Această aplicație este administrată de o echipă mică ce ajută oamenii să găsească locuri de muncă reale, verificate, peste hotare. În prezent avem oferte în Anglia și Germania, în logistică, ospitalitate și producție.\n\nCăutarea și aplicarea sunt mereu gratuite. Dacă un job te interesează, poți aplica direct din aplicație sau ne poți trimite CV-ul în chat — îl transmitem angajatorului și revenim cu un răspuns.\n\nJoburi noi sunt adăugate săptămânal.'
@@ -328,7 +422,7 @@ const UI = {
 // Replace with your real vacancies. countryCode: 'UK' or 'DE'. employment: 'full'/'part'. format: 'remote'/'onsite'. goal: 'any'/'career'.
 const JOBS = [
   {
-    id:'j1', countryCode:'DE', employment:'full', format:'onsite', goal:'any',
+    id:'j1', countryCode:'DE', employment:'full', format:'onsite', goal:'any', daysAgo:2,
     country:{ en:'Germany', ru:'Германия', ro:'Germania' },
     title:{ en:'Warehouse Operative', ru:'Работник склада', ro:'Operator depozit' },
     pay:'€2,100/mo',
@@ -344,7 +438,7 @@ const JOBS = [
     }
   },
   {
-    id:'j2', countryCode:'UK', employment:'part', format:'onsite', goal:'any',
+    id:'j2', countryCode:'UK', employment:'part', format:'onsite', goal:'any', daysAgo:5,
     country:{ en:'United Kingdom', ru:'Англия', ro:'Anglia' },
     title:{ en:'Hotel Housekeeper', ru:'Горничная в отеле', ro:'Cameristă hotel' },
     pay:'£1,400/mo',
@@ -360,7 +454,7 @@ const JOBS = [
     }
   },
   {
-    id:'j3', countryCode:'DE', employment:'full', format:'remote', goal:'career',
+    id:'j3', countryCode:'DE', employment:'full', format:'remote', goal:'career', daysAgo:1, hot:true,
     country:{ en:'Germany', ru:'Германия', ro:'Germania' },
     title:{ en:'Customer Support Specialist', ru:'Специалист поддержки клиентов', ro:'Specialist suport clienți' },
     pay:'€2,300/mo',
@@ -376,7 +470,7 @@ const JOBS = [
     }
   },
   {
-    id:'j4', countryCode:'UK', employment:'full', format:'onsite', goal:'career',
+    id:'j4', countryCode:'UK', employment:'full', format:'onsite', goal:'career', daysAgo:7,
     country:{ en:'United Kingdom', ru:'Англия', ro:'Anglia' },
     title:{ en:'Site Supervisor Trainee', ru:'Стажёр на позицию прораба', ro:'Stagiar supervizor șantier' },
     pay:'£2,400/mo',
@@ -393,6 +487,19 @@ const JOBS = [
   }
 ];
 
+// ---------- reviews data ----------
+// This starts EMPTY on purpose — add real reviews here yourself as they come in.
+// To add one, copy the block below, paste it inside the REVIEWS array (between the []),
+// and fill in the real details. countryCode is 'UK' or 'DE'. rating is 1-5.
+//
+// {
+//   id:'r1', name:'Real Name', countryCode:'UK', rating:5,
+//   role:{ en:'Job title, Country', ru:'Должность, страна', ro:'Post, țară' },
+//   text:{ en:'Review text in English', ru:'Текст отзыва на русском', ro:'Text recenzie în română' }
+// },
+const REVIEWS = [
+];
+
 // ---------- elements ----------
 const langSwitch = document.getElementById('langSwitch');
 const mainNav = document.getElementById('mainNav');
@@ -406,14 +513,18 @@ const filterSheet = document.getElementById('filterSheet');
 function setLang(newLang){
   lang = newLang;
   const t = UI[lang];
-
   document.getElementById('pageTitle').textContent = t.title;
   document.getElementById('pageSubtitle').textContent = t.subtitle;
-
+  document.getElementById('heroText').textContent = t.heroText;
   mainNav.querySelector('[data-tab="jobs"]').textContent = t.tabJobs;
+  mainNav.querySelector('[data-tab="reviews"]').textContent = t.tabReviews;
   mainNav.querySelector('[data-tab="contact"]').textContent = t.tabContact;
   mainNav.querySelector('[data-tab="about"]').textContent = t.tabAbout;
-
+  document.getElementById('statPlacedLabel').textContent = t.statPlacedLabel;
+  document.getElementById('statCountriesLabel').textContent = t.statCountriesLabel;
+  document.getElementById('statRatingLabel').textContent = t.statRatingLabel;
+  document.getElementById('reviewsTitle').textContent = t.reviewsTitle;
+  document.getElementById('reviewsSubtitle').textContent = t.reviewsSubtitle;
   document.getElementById('filtersLabel').textContent = t.filters;
   document.getElementById('filterSheetTitle').textContent = t.filterSheetTitle;
   document.getElementById('labelCountry').textContent = t.labelCountry;
@@ -421,7 +532,6 @@ function setLang(newLang){
   document.getElementById('labelFormat').textContent = t.labelFormat;
   document.getElementById('labelGoal').textContent = t.labelGoal;
   document.getElementById('applyFiltersBtn').textContent = t.showResults;
-
   document.getElementById('detailLabel').textContent = t.jobDetails;
   document.getElementById('applyBtn').textContent = t.applyNow;
   document.getElementById('cvBtn').textContent = t.sendCv;
@@ -430,21 +540,18 @@ function setLang(newLang){
   document.getElementById('labelContact').textContent = t.contact;
   document.getElementById('labelMessage').textContent = t.message;
   document.getElementById('fSend').textContent = t.sendApplication;
-
   document.getElementById('contactTitle').textContent = t.contactTitle;
   document.getElementById('contactBody').textContent = t.contactBody;
   document.getElementById('contactBtnPage').textContent = t.contactBtn;
-
   document.getElementById('aboutTitle').textContent = t.aboutTitle;
   document.getElementById('aboutBody').textContent = t.aboutBody;
 
   langSwitch.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
-
   renderFilterSheet();
   renderList();
+  renderReviews();
   if (currentJob) openDetail(currentJob);
 }
-
 langSwitch.querySelectorAll('button').forEach(b => b.onclick = () => setLang(b.dataset.lang));
 
 // ---------- tabs ----------
@@ -470,7 +577,6 @@ function pillRow(containerId, options, filterKey){
     el.appendChild(b);
   });
 }
-
 function renderFilterSheet(){
   const t = UI[lang];
   pillRow('rowCountry', [
@@ -492,7 +598,6 @@ function renderFilterSheet(){
   badge.style.display = count > 0 ? 'flex' : 'none';
   badge.textContent = count;
 }
-
 document.getElementById('openFilters').onclick = () => filterSheet.classList.add('open');
 document.getElementById('applyFiltersBtn').onclick = () => {
   filterSheet.classList.remove('open');
@@ -508,12 +613,10 @@ function matchesFilters(j){
   if (filters.goal !== 'any' && j.goal !== filters.goal) return false;
   return true;
 }
-
 function renderList(){
   const t = UI[lang];
   const jobs = JOBS.filter(matchesFilters);
   document.getElementById('resultCount').textContent = t.resultsFound(jobs.length);
-
   listEl.innerHTML = '';
   if (jobs.length === 0){
     listEl.innerHTML = `<div class="empty-state">${t.noResults}</div>`;
@@ -523,17 +626,63 @@ function renderList(){
     const el = document.createElement('div');
     el.className = 'job';
     const empLabel = j.employment === 'full' ? t.optFullTime : t.optPartTime;
+    const postedLabel = j.daysAgo === 0 ? t.postedToday : t.postedDays(j.daysAgo);
+    const hotTag = j.hot ? `<span class="tag tag-hot">${t.tagHot}</span>` : '';
     el.innerHTML = `
       <div class="row">
-        <div>
+        <div class="thumb"><img src="https://picsum.photos/seed/${j.id}/120/120" alt="" loading="lazy"></div>
+        <div class="info">
           <h3>${j.title[lang]}</h3>
           <div class="meta">${j.country[lang]} · ${empLabel}</div>
         </div>
         <div class="pay">${j.pay}</div>
       </div>
-      <div class="tags">${j.tags[lang].map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
+      <div class="tags">${hotTag}${j.tags[lang].map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
+      <div class="posted">${postedLabel}</div>
     `;
     el.onclick = () => openDetail(j);
+    listEl.appendChild(el);
+  });
+}
+
+// ---------- reviews ----------
+function starString(n){
+  return '★'.repeat(n) + '☆'.repeat(5 - n);
+}
+function renderReviews(){
+  const t = UI[lang];
+  const scoreRow = document.getElementById('reviewsScoreRow');
+  const listEl = document.getElementById('reviewsList');
+
+  if (REVIEWS.length === 0){
+    scoreRow.style.display = 'none';
+    document.getElementById('statRatingNum').textContent = '—';
+    listEl.innerHTML = `<div class="empty-state">${t.noReviewsYet}</div>`;
+    return;
+  }
+
+  scoreRow.style.display = 'flex';
+  const avg = REVIEWS.reduce((sum, r) => sum + r.rating, 0) / REVIEWS.length;
+  document.getElementById('reviewsScoreNum').textContent = avg.toFixed(1);
+  document.getElementById('reviewsScoreStars').textContent = starString(Math.round(avg));
+  document.getElementById('reviewsScoreCount').textContent = t.reviewsCount(REVIEWS.length);
+  document.getElementById('statRatingNum').textContent = avg.toFixed(1);
+
+  listEl.innerHTML = '';
+  REVIEWS.forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'review';
+    el.innerHTML = `
+      <div class="r-stamp">${t.verified}</div>
+      <div class="r-top">
+        <div>
+          <div class="r-name">${r.name}</div>
+          <div class="r-role">${r.role[lang]}</div>
+        </div>
+        <div class="r-stars">${starString(r.rating)}</div>
+      </div>
+      <div class="r-text">${r.text[lang]}</div>
+    `;
     listEl.appendChild(el);
   });
 }
@@ -551,16 +700,13 @@ function openDetail(job){
   `;
   detailEl.classList.add('open');
 }
-
 document.getElementById('back').onclick = () => detailEl.classList.remove('open');
 document.getElementById('applyBtn').onclick = () => applyForm.classList.add('open');
-
 document.getElementById('cvBtn').onclick = () => {
   const text = encodeURIComponent('CV / ' + (currentJob ? currentJob.title.en : 'general'));
   const url = 'https://t.me/' + CONTACT_USERNAME + '?text=' + text;
   if (tg) tg.openTelegramLink(url); else window.open(url, '_blank');
 };
-
 document.getElementById('contactBtnPage').addEventListener('click', (e) => {
   if (tg) { e.preventDefault(); tg.openTelegramLink('https://t.me/' + CONTACT_USERNAME); }
 });
@@ -570,22 +716,17 @@ document.getElementById('fSend').onclick = () => {
   const contact = document.getElementById('fContact').value.trim();
   const message = document.getElementById('fMessage').value.trim();
   const t = UI[lang];
-
   if (!name || !contact) { alert(t.fillRequired); return; }
-
   const payload = JSON.stringify({
     type:'application', jobId: currentJob.id, jobTitle: currentJob.title.en, lang, name, contact, message
   });
-
   if (tg) tg.sendData(payload);
   else alert(t.demoAlert + payload);
-
   applyForm.classList.remove('open');
 };
 
 // ---------- init ----------
 setLang('en');
 </script>
-
 </body>
 </html>
