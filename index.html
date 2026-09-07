@@ -15,7 +15,6 @@
     --khaki-dim: #6f6a48;
     --off-white: #ece8dd;
     --line: #2c2b22;
-    --danger: #c4553f;
   }
   *{ box-sizing: border-box; }
   body{
@@ -26,13 +25,17 @@
     -webkit-font-smoothing: antialiased;
   }
   header{
-    padding: 26px 18px 18px;
+    padding: 22px 18px 18px;
     border-bottom: 2px solid var(--khaki);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap: 12px;
   }
   header h1{
     margin:0 0 4px;
     font-family: 'Archivo Black', sans-serif;
-    font-size: 26px;
+    font-size: 24px;
     letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--off-white);
@@ -44,6 +47,29 @@
     letter-spacing: 1.5px;
     text-transform: uppercase;
     color: var(--khaki);
+  }
+  .lang-switch{
+    display:flex;
+    gap:4px;
+    flex: none;
+    margin-top: 2px;
+  }
+  .lang-switch button{
+    border: 1px solid var(--khaki-dim);
+    background: transparent;
+    color: var(--khaki-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 5px 9px;
+    border-radius: 2px;
+    cursor:pointer;
+  }
+  .lang-switch button.active{
+    background: var(--khaki);
+    border-color: var(--khaki);
+    color: var(--black);
   }
   .filters{
     display:flex;
@@ -218,8 +244,15 @@
 <body>
 
 <header>
-  <h1>Overseas Jobs</h1>
-  <p>Vacancies abroad — updated weekly</p>
+  <div>
+    <h1 id="pageTitle">Overseas Jobs</h1>
+    <p id="pageSubtitle">Vacancies abroad — updated weekly</p>
+  </div>
+  <div class="lang-switch" id="langSwitch">
+    <button data-lang="en">EN</button>
+    <button data-lang="ru">RU</button>
+    <button data-lang="ro">RO</button>
+  </div>
 </header>
 
 <div class="filters" id="filters"></div>
@@ -228,7 +261,7 @@
 <div id="detail">
   <div class="top">
     <button id="back">←</button>
-    <strong>Job details</strong>
+    <strong id="detailLabel">Job details</strong>
   </div>
   <div class="body" id="detailBody"></div>
   <div id="applyBar"><button id="applyBtn">Apply now</button></div>
@@ -236,13 +269,13 @@
 
 <div id="applyForm">
   <div class="sheet">
-    <h3>Send application</h3>
-    <label>Full name</label>
-    <input id="fName" type="text" placeholder="Your name">
-    <label>Contact (phone or email)</label>
-    <input id="fContact" type="text" placeholder="+1 555 000 0000 or you@email.com">
-    <label>Message (optional)</label>
-    <textarea id="fMessage" rows="3" placeholder="Anything you'd like us to know"></textarea>
+    <h3 id="formTitle">Send application</h3>
+    <label id="labelName">Full name</label>
+    <input id="fName" type="text">
+    <label id="labelContact">Contact (phone or email)</label>
+    <input id="fContact" type="text" placeholder="+1 555 000 0000 / you@email.com">
+    <label id="labelMessage">Message (optional)</label>
+    <textarea id="fMessage" rows="3"></textarea>
     <button class="send" id="fSend">Send application</button>
   </div>
 </div>
@@ -251,34 +284,135 @@
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 
-// Replace with your real vacancies
+let lang = 'en';
+
+const UI = {
+  en: {
+    title: 'Overseas Jobs', subtitle: 'Vacancies abroad — updated weekly',
+    all: 'All', jobDetails: 'Job details', applyNow: 'Apply now',
+    sendApplication: 'Send application', fullName: 'Full name',
+    contact: 'Contact (phone or email)', message: 'Message (optional)',
+    fillRequired: 'Please fill in your name and contact.',
+    demoAlert: 'Application (demo, outside Telegram):\n', thanks: 'Thanks! Application sent'
+  },
+  ru: {
+    title: 'Работа за рубежом', subtitle: 'Вакансии за границей — обновляется еженедельно',
+    all: 'Все', jobDetails: 'О вакансии', applyNow: 'Откликнуться',
+    sendApplication: 'Отправить отклик', fullName: 'Полное имя',
+    contact: 'Контакт (телефон или email)', message: 'Сообщение (необязательно)',
+    fillRequired: 'Заполните имя и контакт.',
+    demoAlert: 'Отклик (демо, вне Telegram):\n', thanks: 'Спасибо! Отклик отправлен'
+  },
+  ro: {
+    title: 'Locuri de muncă peste hotare', subtitle: 'Oferte actualizate săptămânal',
+    all: 'Toate', jobDetails: 'Detalii job', applyNow: 'Aplică acum',
+    sendApplication: 'Trimite aplicația', fullName: 'Nume complet',
+    contact: 'Contact (telefon sau email)', message: 'Mesaj (opțional)',
+    fillRequired: 'Completează numele și contactul.',
+    demoAlert: 'Aplicație (demo, în afara Telegram):\n', thanks: 'Mulțumim! Aplicația a fost trimisă'
+  }
+};
+
+const CATEGORY_LABELS = {
+  Logistics: { en:'Logistics', ru:'Логистика', ro:'Logistică' },
+  Hospitality: { en:'Hospitality', ru:'Гостиничное дело', ro:'Ospitalitate' },
+  Manufacturing: { en:'Manufacturing', ru:'Производство', ro:'Producție' },
+};
+
+// Replace with your real vacancies. Fill "en/ru/ro" for each field you want translated.
 const JOBS = [
-  { id:'j1', title:'Warehouse Operative', country:'Germany', category:'Logistics',
-    pay:'€2,100/mo', tags:['Accommodation provided','No experience needed'],
-    desc:'Full-time warehouse role in a logistics hub near Berlin.\n\nDuties: picking, packing, loading.\nContract: 6 months, extendable.\nAccommodation and transport to work included.' },
-  { id:'j2', title:'Hotel Housekeeper', country:'Malta', category:'Hospitality',
-    pay:'€1,650/mo', tags:['Seasonal','Meals included'],
-    desc:'Seasonal housekeeping position at a beachfront hotel.\n\nDuties: room cleaning, laundry support.\nContract: April–October.\nMeals and staff housing included.' },
-  { id:'j3', title:'CNC Machine Operator', country:'Poland', category:'Manufacturing',
-    pay:'€1,900/mo', tags:['Training provided'],
-    desc:'Factory role operating CNC milling machines.\n\nDuties: machine setup, quality checks.\nContract: 12 months.\nOn-site training provided in the first two weeks.' },
+  {
+    id:'j1', category:'Logistics',
+    country:{ en:'Germany', ru:'Германия', ro:'Germania' },
+    title:{ en:'Warehouse Operative', ru:'Работник склада', ro:'Operator depozit' },
+    pay:'€2,100/mo',
+    tags:{
+      en:['Accommodation provided','No experience needed'],
+      ru:['Жильё предоставляется','Опыт не обязателен'],
+      ro:['Cazare inclusă','Fără experiență necesară']
+    },
+    desc:{
+      en:'Full-time warehouse role in a logistics hub near Berlin.\n\nDuties: picking, packing, loading.\nContract: 6 months, extendable.\nAccommodation and transport to work included.',
+      ru:'Работа на складе полный день, логистический центр рядом с Берлином.\n\nОбязанности: комплектация, упаковка, погрузка.\nКонтракт: 6 месяцев с продлением.\nЖильё и транспорт до работы включены.',
+      ro:'Post cu normă întreagă într-un hub logistic lângă Berlin.\n\nSarcini: preluare, ambalare, încărcare.\nContract: 6 luni, prelungibil.\nCazare și transport la muncă incluse.'
+    }
+  },
+  {
+    id:'j2', category:'Hospitality',
+    country:{ en:'Malta', ru:'Мальта', ro:'Malta' },
+    title:{ en:'Hotel Housekeeper', ru:'Горничная в отеле', ro:'Cameristă hotel' },
+    pay:'€1,650/mo',
+    tags:{
+      en:['Seasonal','Meals included'],
+      ru:['Сезонная работа','Питание включено'],
+      ro:['Sezonier','Masă inclusă']
+    },
+    desc:{
+      en:'Seasonal housekeeping position at a beachfront hotel.\n\nDuties: room cleaning, laundry support.\nContract: April–October.\nMeals and staff housing included.',
+      ru:'Сезонная работа горничной в отеле на берегу моря.\n\nОбязанности: уборка номеров, помощь с прачечной.\nКонтракт: апрель–октябрь.\nПитание и жильё для персонала включены.',
+      ro:'Post sezonier de cameristă într-un hotel de pe litoral.\n\nSarcini: curățenie camere, sprijin la spălătorie.\nContract: aprilie–octombrie.\nMasă și cazare pentru personal incluse.'
+    }
+  },
+  {
+    id:'j3', category:'Manufacturing',
+    country:{ en:'Poland', ru:'Польша', ro:'Polonia' },
+    title:{ en:'CNC Machine Operator', ru:'Оператор ЧПУ', ro:'Operator CNC' },
+    pay:'€1,900/mo',
+    tags:{
+      en:['Training provided'],
+      ru:['Обучение предоставляется'],
+      ro:['Instruire oferită']
+    },
+    desc:{
+      en:'Factory role operating CNC milling machines.\n\nDuties: machine setup, quality checks.\nContract: 12 months.\nOn-site training provided in the first two weeks.',
+      ru:'Работа на заводе с фрезерными станками с ЧПУ.\n\nОбязанности: настройка станка, контроль качества.\nКонтракт: 12 месяцев.\nОбучение на месте в первые две недели.',
+      ro:'Post în fabrică pentru operarea mașinilor CNC de frezat.\n\nSarcini: configurare mașină, control calitate.\nContract: 12 luni.\nInstruire la fața locului în primele două săptămâni.'
+    }
+  }
 ];
 
-const CATEGORIES = ['All', ...new Set(JOBS.map(j => j.category))];
 let activeCategory = 'All';
 let currentJob = null;
 
+const langSwitch = document.getElementById('langSwitch');
 const filtersEl = document.getElementById('filters');
 const listEl = document.getElementById('list');
 const detailEl = document.getElementById('detail');
 const detailBody = document.getElementById('detailBody');
 const applyForm = document.getElementById('applyForm');
 
+function setLang(newLang){
+  lang = newLang;
+  const t = UI[lang];
+  document.getElementById('pageTitle').textContent = t.title;
+  document.getElementById('pageSubtitle').textContent = t.subtitle;
+  document.getElementById('detailLabel').textContent = t.jobDetails;
+  document.getElementById('applyBtn').textContent = t.applyNow;
+  document.getElementById('formTitle').textContent = t.sendApplication;
+  document.getElementById('labelName').textContent = t.fullName;
+  document.getElementById('labelContact').textContent = t.contact;
+  document.getElementById('labelMessage').textContent = t.message;
+  document.getElementById('fSend').textContent = t.sendApplication;
+
+  langSwitch.querySelectorAll('button').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+
+  renderFilters();
+  renderList();
+  if (currentJob) openDetail(currentJob);
+}
+
+langSwitch.querySelectorAll('button').forEach(b => {
+  b.onclick = () => setLang(b.dataset.lang);
+});
+
 function renderFilters(){
+  const cats = ['All', ...new Set(JOBS.map(j => j.category))];
   filtersEl.innerHTML = '';
-  CATEGORIES.forEach(cat => {
+  cats.forEach(cat => {
     const b = document.createElement('button');
-    b.textContent = cat;
+    b.textContent = cat === 'All' ? UI[lang].all : CATEGORY_LABELS[cat][lang];
     if (cat === activeCategory) b.classList.add('active');
     b.onclick = () => { activeCategory = cat; renderFilters(); renderList(); };
     filtersEl.appendChild(b);
@@ -294,12 +428,12 @@ function renderList(){
     el.innerHTML = `
       <div class="row">
         <div>
-          <h3>${j.title}</h3>
-          <div class="meta">${j.country} · ${j.category}</div>
+          <h3>${j.title[lang]}</h3>
+          <div class="meta">${j.country[lang]} · ${CATEGORY_LABELS[j.category][lang]}</div>
         </div>
         <div class="pay">${j.pay}</div>
       </div>
-      <div class="tags">${j.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      <div class="tags">${j.tags[lang].map(t => `<span class="tag">${t}</span>`).join('')}</div>
     `;
     el.onclick = () => openDetail(j);
     listEl.appendChild(el);
@@ -309,10 +443,10 @@ function renderList(){
 function openDetail(job){
   currentJob = job;
   detailBody.innerHTML = `
-    <h2>${job.title}</h2>
-    <div class="meta-line">${job.country} · ${job.category}</div>
+    <h2>${job.title[lang]}</h2>
+    <div class="meta-line">${job.country[lang]} · ${CATEGORY_LABELS[job.category][lang]}</div>
     <div class="pay-box">${job.pay}</div>
-    <div class="desc">${job.desc}</div>
+    <div class="desc">${job.desc[lang]}</div>
   `;
   detailEl.classList.add('open');
 }
@@ -326,27 +460,26 @@ document.getElementById('fSend').onclick = () => {
   const message = document.getElementById('fMessage').value.trim();
 
   if (!name || !contact) {
-    alert('Please fill in your name and contact.');
+    alert(UI[lang].fillRequired);
     return;
   }
 
   const payload = JSON.stringify({
     type: 'application',
     jobId: currentJob.id,
-    jobTitle: currentJob.title,
-    name, contact, message
+    jobTitle: currentJob.title.en,
+    lang, name, contact, message
   });
 
   if (tg) {
     tg.sendData(payload);
   } else {
-    alert('Application (demo, outside Telegram):\n' + payload);
+    alert(UI[lang].demoAlert + payload);
   }
   applyForm.classList.remove('open');
 };
 
-renderFilters();
-renderList();
+setLang('en');
 </script>
 
 </body>
