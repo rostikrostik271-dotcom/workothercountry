@@ -11,9 +11,9 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   :root{
-    --bg:#F7F8F7; --surface:#FFFFFF; --primary:#263338; --accent:#4CAF7D;
-    --accent-soft:#E3F3EA; --accent-dark:#3D9468; --text-secondary:#78909C;
-    --border:#E7EBEF; --danger:#E4664B;
+    --bg:#F6F7FB; --surface:#FFFFFF; --primary:#20243A; --accent:#6C63FF;
+    --accent-soft:#EDEBFF; --accent-dark:#4B41D6; --text-secondary:#777B91;
+    --border:#E4E3EE; --danger:#E4664B;
   }
   *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   body{ margin:0; background:var(--bg); color:var(--primary);
@@ -30,6 +30,30 @@
   .screen{ display:none; }
   .screen.active{ display:block; }
   #app{ padding-bottom:78px; }
+
+  /* Splash / onboarding */
+  #screen-splash{ position:fixed; inset:0; background:var(--primary); z-index:40; display:flex;
+    flex-direction:column; padding:32px 22px; color:#fff; }
+  #screen-splash.hidden{ display:none; }
+  #screen-splash .splash-icon{ width:52px; height:52px; border-radius:50%; background:var(--accent-soft);
+    display:flex; align-items:center; justify-content:center; margin-bottom:60px; }
+  #screen-splash .splash-icon svg{ width:24px; height:24px; fill:none; stroke:var(--primary); stroke-width:1.8; }
+  #screen-splash h1{ font-size:26px; font-weight:800; line-height:1.25; margin:0 0 10px; }
+  #screen-splash p{ font-size:14px; color:#B9B7E8; font-weight:500; margin:0 0 16px; line-height:1.5; }
+  #screen-splash .splash-tags{ display:flex; gap:8px; flex-wrap:wrap; }
+  #screen-splash .splash-tags span{ font-size:11px; font-weight:700; color:#D8D6F5; background:rgba(255,255,255,0.08);
+    padding:6px 12px; border-radius:20px; }
+  #screen-splash .splash-start{ margin-top:auto; width:100%; padding:16px; border:none; background:var(--accent);
+    color:#fff; font-size:15px; font-weight:700; border-radius:14px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:8px; }
+
+  /* Quick country chips */
+  .quick-chips{ display:flex; gap:8px; padding:0 18px 14px; flex-wrap:wrap; }
+  .quick-chips button{ border:none; background:var(--surface); border:1px solid var(--border); color:var(--primary);
+    font-size:12px; font-weight:700; padding:8px 14px; border-radius:20px; cursor:pointer; }
+  .quick-chips button.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
+
+  .job .chevron{ align-self:center; color:var(--text-secondary); font-size:16px; flex:none; }
 
   /* Stat strip */
   .stat-strip{ display:flex; margin:0 18px 14px; background:var(--surface); border-radius:14px;
@@ -92,6 +116,13 @@
     display:flex; align-items:center; justify-content:center; flex:none; font-size:18px; }
   .trust-banner .title{ font-size:13px; font-weight:700; }
   .trust-banner .sub{ font-size:11px; color:var(--text-secondary); font-weight:500; }
+
+  .warn-banner{ display:flex; align-items:flex-start; gap:12px; background:var(--accent-soft); border:1px solid var(--accent);
+    border-radius:14px; padding:14px; margin:0 0 18px; }
+  .warn-banner .icon{ width:34px; height:34px; border-radius:10px; background:var(--surface);
+    display:flex; align-items:center; justify-content:center; flex:none; font-size:16px; }
+  .warn-banner .title{ font-size:13px; font-weight:700; margin-bottom:2px; }
+  .warn-banner .sub{ font-size:12px; color:var(--primary); line-height:1.5; font-weight:500; }
 
   /* Reviews */
   .review{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:12px; }
@@ -172,6 +203,17 @@
 </head>
 <body>
 
+<div id="screen-splash">
+  <div class="splash-icon"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
+  <h1 id="splashTitle">Wide choice of jobs abroad</h1>
+  <p id="splashSub">Builders, crane operators, tilers and other vacancies</p>
+  <div class="splash-tags">
+    <span id="splashTagDE">Germany</span>
+    <span id="splashTagUK">United Kingdom</span>
+  </div>
+  <button class="splash-start" id="splashStart"><span id="splashStartLabel">Start</span> →</button>
+</div>
+
 <div id="app">
 
 <header>
@@ -205,6 +247,8 @@
   <div class="search-bar">
     <input type="text" id="searchInput" placeholder="Search by title or country...">
   </div>
+
+  <div class="quick-chips" id="quickChips"></div>
 
   <div class="filters-bar">
     <button id="openFilters">
@@ -240,6 +284,13 @@
     <div class="divider"></div>
     <h2 id="aboutTitle">About us</h2>
     <p id="aboutBody"></p>
+    <div class="warn-banner">
+      <div class="icon">⚠️</div>
+      <div>
+        <div class="title" id="warnTitle">Never pay for a job</div>
+        <div class="sub" id="warnBody">We never ask for money for a vacancy, visa help or "guaranteed placement". If anyone asks you to pay, it's a scam — please report it to us.</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -373,7 +424,12 @@ const UI = {
     contactTitle:'Contact', contactBody:'Have a question about a vacancy, or want to send your CV directly? Message us anytime.',
     contactBtn:'Message @'+CONTACT_USERNAME,
     aboutTitle:'About us',
-    aboutBody:'This app is run by a small team helping people find real, verified jobs abroad. We currently list vacancies in the UK and Germany, across logistics, hospitality and manufacturing.\n\nBrowsing and applying is always free. If a listing interests you, apply directly through the app or send your CV in chat — we\'ll pass it on to the employer.\n\nNew vacancies are added weekly.' },
+    aboutBody:'This app is run by a small team helping people find real, verified construction jobs abroad. We currently list vacancies in the UK and Germany — masons, crane operators, tilers, plasterers, roofers and site supervisors.\n\nBrowsing and applying is always free. If a listing interests you, apply directly through the app or send your CV in chat — we\'ll pass it on to the employer.\n\nNew vacancies are added weekly.',
+    warnTitle:'Never pay for a job',
+    warnBody:'We never ask for money for a vacancy, visa help or "guaranteed placement". Applying and browsing are always free. If anyone asks you to pay, it\'s a scam — please report it to us.',
+    splashTitle:'Wide choice of jobs abroad',
+    splashSub:'Builders, crane operators, tilers and other vacancies',
+    splashStartLabel:'Start' },
   ru: { title:'Работа за рубежом', subtitle:'Вакансии за границей — обновляется еженедельно',
     navJobs:'Вакансии', navMap:'Страны', navReviews:'Отзывы', navContact:'Поддержка',
     statJobs:'Активных вакансий', statCountries:'Страны', statFees:'Комиссия за отклик',
@@ -393,7 +449,12 @@ const UI = {
     contactTitle:'Контакт', contactBody:'Есть вопрос по вакансии или хотите отправить резюме напрямую? Пишите в любое время.',
     contactBtn:'Написать @'+CONTACT_USERNAME,
     aboutTitle:'О нас',
-    aboutBody:'Это приложение ведёт небольшая команда, которая помогает находить реальные, проверенные вакансии за рубежом. Сейчас у нас есть вакансии в Англии и Германии — в логистике, гостиничном деле и на производстве.\n\nПросмотр и отклик всегда бесплатны. Если вакансия заинтересовала — откликнитесь прямо в приложении или отправьте резюме нам в чат, мы передадим его работодателю.\n\nНовые вакансии добавляются каждую неделю.' },
+    aboutBody:'Это приложение ведёт небольшая команда, которая помогает находить реальные, проверенные вакансии на стройках за рубежом. Сейчас у нас есть вакансии в Англии и Германии — каменщики, крановщики, плиточники, штукатуры-маляры, кровельщики и прорабы.\n\nПросмотр и отклик всегда бесплатны. Если вакансия заинтересовала — откликнитесь прямо в приложении или отправьте резюме нам в чат, мы передадим его работодателю.\n\nНовые вакансии добавляются каждую неделю.',
+    warnTitle:'Мы никогда не берём деньги за вакансию',
+    warnBody:'Мы никогда не просим оплату за вакансию, помощь с визой или «гарантированное трудоустройство». Просмотр и отклик всегда бесплатны. Если кто-то просит у вас деньги — это мошенничество, пожалуйста, сообщите нам.',
+    splashTitle:'Широкий выбор работ за границей',
+    splashSub:'Строители, крановщики, плиточники и другие вакансии',
+    splashStartLabel:'Начать' },
   ro: { title:'Locuri de muncă peste hotare', subtitle:'Oferte actualizate săptămânal',
     navJobs:'Joburi', navMap:'Țări', navReviews:'Recenzii', navContact:'Suport',
     statJobs:'Joburi active', statCountries:'Țări', statFees:'Comision de aplicare',
@@ -413,36 +474,57 @@ const UI = {
     contactTitle:'Contact', contactBody:'Ai o întrebare despre un job sau vrei să trimiți CV-ul direct? Scrie-ne oricând.',
     contactBtn:'Scrie @'+CONTACT_USERNAME,
     aboutTitle:'Despre noi',
-    aboutBody:'Această aplicație este administrată de o echipă mică ce ajută oamenii să găsească locuri de muncă reale, verificate, peste hotare. În prezent avem oferte în Anglia și Germania, în logistică, ospitalitate și producție.\n\nCăutarea și aplicarea sunt mereu gratuite. Dacă un job te interesează, aplică direct din aplicație sau trimite CV-ul în chat — îl transmitem angajatorului.\n\nJoburi noi sunt adăugate săptămânal.' }
+    aboutBody:'Această aplicație este administrată de o echipă mică ce ajută oamenii să găsească locuri de muncă reale, verificate, pe șantiere peste hotare. În prezent avem oferte în Anglia și Germania — zidari, macaragii, montatori gresie și faianță, tencuitori-zugravi, acoperitori și supervizori de șantier.\n\nCăutarea și aplicarea sunt mereu gratuite. Dacă un job te interesează, aplică direct din aplicație sau trimite CV-ul în chat — îl transmitem angajatorului.\n\nJoburi noi sunt adăugate săptămânal.',
+    warnTitle:'Nu plătim niciodată pentru un job',
+    warnBody:'Nu cerem niciodată bani pentru un job, ajutor cu viza sau „plasare garantată”. Căutarea și aplicarea sunt mereu gratuite. Dacă cineva îți cere bani, este o înșelătorie — te rugăm să ne anunți.',
+    splashTitle:'Alegere largă de joburi peste hotare',
+    splashSub:'Constructori, macaragii, montatori și alte joburi',
+    splashStartLabel:'Începe' }
 };
 
 // Replace with your real vacancies.
 const JOBS = [
-  { id:'j1', countryCode:'DE', employment:'full', format:'onsite', goal:'any', category:'Logistics',
+  { id:'j1', countryCode:'DE', employment:'full', format:'onsite', goal:'any', category:'Construction',
     lat:52.5200, lng:13.4050, deadline:'2026-10-15', status:'open',
-    country:{en:'Germany',ru:'Германия',ro:'Germania'}, title:{en:'Warehouse Operative',ru:'Работник склада',ro:'Operator depozit'},
+    country:{en:'Germany',ru:'Германия',ro:'Germania'}, title:{en:'Mason',ru:'Каменщик',ro:'Zidar'},
     pay:'€2,100/mo',
     tags:{ en:['Accommodation provided','No experience needed'], ru:['Жильё предоставляется','Опыт не обязателен'], ro:['Cazare inclusă','Fără experiență necesară'] },
-    desc:{ en:'Full-time warehouse role in a logistics hub near Berlin.\n\nDuties: picking, packing, loading.\nContract: 6 months, extendable.\nAccommodation and transport to work included.',
-           ru:'Работа на складе полный день, логистический центр рядом с Берлином.\n\nОбязанности: комплектация, упаковка, погрузка.\nКонтракт: 6 месяцев с продлением.\nЖильё и транспорт до работы включены.',
-           ro:'Post cu normă întreagă într-un hub logistic lângă Berlin.\n\nSarcini: preluare, ambalare, încărcare.\nContract: 6 luni, prelungibil.\nCazare și transport la muncă incluse.' } },
-  { id:'j2', countryCode:'UK', employment:'part', format:'onsite', goal:'any', category:'Hospitality',
-    lat:51.5074, lng:-0.1278, deadline:'2026-09-30', status:'open',
-    country:{en:'United Kingdom',ru:'Англия',ro:'Anglia'}, title:{en:'Hotel Housekeeper',ru:'Горничная в отеле',ro:'Cameristă hotel'},
-    pay:'£1,400/mo',
-    tags:{ en:['Part-time','Meals included'], ru:['Частичная занятость','Питание включено'], ro:['Normă parțială','Masă inclusă'] },
-    desc:{ en:'Part-time housekeeping position at a hotel in London.\n\nDuties: room cleaning, laundry support.\nShifts: flexible, 20-25h/week.\nMeals included during shifts.',
-           ru:'Частичная занятость горничной в отеле в Лондоне.\n\nОбязанности: уборка номеров, помощь с прачечной.\nСмены: гибкие, 20-25ч/неделю.\nПитание включено во время смен.',
-           ro:'Post cu normă parțială de cameristă la un hotel din Londra.\n\nSarcini: curățenie camere, sprijin la spălătorie.\nTure: flexibile, 20-25h/săptămână.\nMasă inclusă în timpul turei.' } },
-  { id:'j3', countryCode:'DE', employment:'full', format:'remote', goal:'career', category:'Support',
-    lat:48.1351, lng:11.5820, deadline:'2026-11-01', status:'open',
-    country:{en:'Germany',ru:'Германия',ro:'Germania'}, title:{en:'Customer Support Specialist',ru:'Специалист поддержки клиентов',ro:'Specialist suport clienți'},
+    desc:{ en:'Full-time bricklaying and masonry role on a residential site near Berlin.\n\nDuties: laying brick and block, mixing mortar, reading basic plans.\nContract: 6 months, extendable.\nVisa: employer-sponsored work visa.\nLanguage: basic English (A2) is enough.\nAccommodation and transport to work included.',
+           ru:'Работа каменщиком полный день на жилом объекте рядом с Берлином.\n\nОбязанности: кладка кирпича и блоков, замес раствора, чтение простых чертежей.\nКонтракт: 6 месяцев с продлением.\nВиза: рабочая виза от работодателя.\nЯзык: достаточно базового английского (A2).\nЖильё и транспорт до работы включены.',
+           ro:'Post cu normă întreagă de zidărie pe un șantier rezidențial lângă Berlin.\n\nSarcini: zidărie de cărămidă și blocuri, mortar, citirea planurilor simple.\nContract: 6 luni, prelungibil.\nViză: sponsorizată de angajator.\nLimbă: engleză de bază (A2) este suficientă.\nCazare și transport la muncă incluse.' } },
+  { id:'j2', countryCode:'DE', employment:'full', format:'onsite', goal:'career', category:'Construction',
+    lat:52.5200, lng:13.4050, deadline:'2026-10-30', status:'open',
+    country:{en:'Germany',ru:'Германия',ro:'Germania'}, title:{en:'Crane Operator',ru:'Крановщик',ro:'Macaragiu'},
+    pay:'€2,400/mo',
+    tags:{ en:['License required','Career growth'], ru:['Нужны права','Карьерный рост'], ro:['Permis necesar','Creștere în carieră'] },
+    desc:{ en:'Tower crane operator role on a large construction site near Berlin.\n\nDuties: operating a tower crane, coordinating lifts with the site team.\nRequirements: valid crane operator license or willingness to certify.\nContract: 12 months.\nVisa: employer-sponsored work visa.\nLanguage: basic English (A2).\nAccommodation not included, relocation bonus provided.',
+           ru:'Работа крановщиком башенного крана на крупном объекте рядом с Берлином.\n\nОбязанности: управление башенным краном, координация подъёмов с бригадой.\nТребования: действующие права крановщика или готовность получить сертификат.\nКонтракт: 12 месяцев.\nВиза: рабочая виза от работодателя.\nЯзык: базовый английский (A2).\nЖильё не включено, есть компенсация на переезд.',
+           ro:'Post de macaragiu turn pe un șantier mare lângă Berlin.\n\nSarcini: operarea macaralei turn, coordonarea ridicărilor cu echipa.\nCerințe: permis de macaragiu valabil sau disponibilitate de certificare.\nContract: 12 luni.\nViză: sponsorizată de angajator.\nLimbă: engleză de bază (A2).\nCazare neinclusă, bonus de relocare oferit.' } },
+  { id:'j3', countryCode:'UK', employment:'full', format:'onsite', goal:'any', category:'Construction',
+    lat:53.4808, lng:-2.2426, deadline:'2026-09-30', status:'open',
+    country:{en:'United Kingdom',ru:'Англия',ro:'Anglia'}, title:{en:'Tiler',ru:'Плиточник',ro:'Montator gresie și faianță'},
+    pay:'£1,900/mo',
+    tags:{ en:['Accommodation provided','Weekly pay'], ru:['Жильё предоставляется','Оплата еженедельно'], ro:['Cazare inclusă','Plată săptămânală'] },
+    desc:{ en:'Tiling role on residential renovation projects near Manchester.\n\nDuties: floor and wall tiling, surface prep, finishing work.\nContract: 6 months, extendable.\nVisa: Skilled Worker visa required.\nLanguage: conversational English (B1).\nAccommodation provided, weekly pay.',
+           ru:'Работа плиточником на объектах ремонта жилья рядом с Манчестером.\n\nОбязанности: облицовка пола и стен плиткой, подготовка поверхности, отделка.\nКонтракт: 6 месяцев с продлением.\nВиза: требуется рабочая виза Skilled Worker.\nЯзык: разговорный английский (B1).\nЖильё предоставляется, оплата еженедельно.',
+           ro:'Post de montator gresie și faianță pe proiecte de renovare rezidențială lângă Manchester.\n\nSarcini: montaj gresie și faianță pe podea și pereți, pregătirea suprafeței, finisaj.\nContract: 6 luni, prelungibil.\nViză: necesită viză Skilled Worker.\nLimbă: engleză conversațională (B1).\nCazare inclusă, plată săptămânală.' } },
+  { id:'j4', countryCode:'UK', employment:'full', format:'onsite', goal:'any', category:'Construction',
+    lat:51.5074, lng:-0.1278, deadline:'2026-10-05', status:'open',
+    country:{en:'United Kingdom',ru:'Англия',ro:'Anglia'}, title:{en:'Plasterer / Painter',ru:'Штукатур-маляр',ro:'Tencuitor / Zugrav'},
+    pay:'£2,000/mo',
+    tags:{ en:['Career growth','No experience needed'], ru:['Карьерный рост','Опыт не обязателен'], ro:['Creștere în carieră','Fără experiență necesară'] },
+    desc:{ en:'Plastering and painting role on new-build and renovation sites in London.\n\nDuties: skimming walls, filling, priming, painting interior and exterior surfaces.\nContract: 9 months.\nVisa: Skilled Worker visa, employer will assist.\nLanguage: conversational English (B1).\nAccommodation not included; relocation cost split with employer.',
+           ru:'Работа штукатуром-маляром на новостройках и ремонтных объектах в Лондоне.\n\nОбязанности: шпаклёвка стен, грунтовка, покраска внутренних и наружных поверхностей.\nКонтракт: 9 месяцев.\nВиза: Skilled Worker, работодатель поможет с оформлением.\nЯзык: разговорный английский (B1).\nЖильё не включено; переезд оплачивается пополам с работодателем.',
+           ro:'Post de tencuitor și zugrav pe șantiere noi și de renovare din Londra.\n\nSarcini: tencuială, chit, grund, vopsire suprafețe interioare și exterioare.\nContract: 9 luni.\nViză: Skilled Worker, angajatorul asistă la obținere.\nLimbă: engleză conversațională (B1).\nCazare neinclusă; costul relocării este împărțit cu angajatorul.' } },
+  { id:'j5', countryCode:'DE', employment:'full', format:'onsite', goal:'any', category:'Construction',
+    lat:53.5511, lng:9.9937, deadline:'2026-11-15', status:'open',
+    country:{en:'Germany',ru:'Германия',ro:'Germania'}, title:{en:'Roofer',ru:'Кровельщик',ro:'Acoperitor'},
     pay:'€2,300/mo',
-    tags:{ en:['Remote','Training provided'], ru:['Удалённо','Обучение предоставляется'], ro:['Remote','Instruire oferită'] },
-    desc:{ en:'Remote customer support role for a growing logistics company.\n\nDuties: handling client queries via chat and email.\nContract: 12 months, career growth path to team lead.\nFull training provided in the first month.',
-           ru:'Удалённая работа в поддержке клиентов растущей логистической компании.\n\nОбязанности: обработка запросов клиентов в чате и по email.\nКонтракт: 12 месяцев, есть карьерный рост до тимлида.\nПолное обучение в первый месяц.',
-           ro:'Post remote de suport clienți pentru o companie de logistică în creștere.\n\nSarcini: gestionarea cererilor clienților prin chat și email.\nContract: 12 luni, posibilitate de creștere spre team lead.\nInstruire completă în prima lună.' } },
-  { id:'j4', countryCode:'UK', employment:'full', format:'onsite', goal:'career', category:'Construction',
+    tags:{ en:['Accommodation provided','Training provided'], ru:['Жильё предоставляется','Обучение предоставляется'], ro:['Cazare inclusă','Instruire oferită'] },
+    desc:{ en:'Roofing role on residential and light commercial buildings near Hamburg.\n\nDuties: installing and repairing pitched and flat roofs, working with tiles, membranes and insulation.\nContract: 8 months, extendable.\nVisa: employer-sponsored work visa.\nLanguage: basic English (A2), German a plus.\nAccommodation provided, safety training included.',
+           ru:'Работа кровельщиком на жилых и небольших коммерческих объектах рядом с Гамбургом.\n\nОбязанности: монтаж и ремонт скатных и плоских крыш, работа с черепицей, мембранами и утеплителем.\nКонтракт: 8 месяцев с продлением.\nВиза: рабочая виза от работодателя.\nЯзык: базовый английский (A2), немецкий — плюс.\nЖильё предоставляется, обучение технике безопасности включено.',
+           ro:'Post de acoperitor pe clădiri rezidențiale și comerciale mici lângă Hamburg.\n\nSarcini: montaj și reparații acoperișuri înclinate și plate, lucru cu țiglă, membrane și izolație.\nContract: 8 luni, prelungibil.\nViză: sponsorizată de angajator.\nLimbă: engleză de bază (A2), germana un plus.\nCazare inclusă, instruire de siguranță inclusă.' } },
+  { id:'j6', countryCode:'UK', employment:'full', format:'onsite', goal:'career', category:'Construction',
     lat:53.4808, lng:-2.2426, deadline:'2026-09-20', status:'closed',
     country:{en:'United Kingdom',ru:'Англия',ro:'Anglia'}, title:{en:'Site Supervisor Trainee',ru:'Стажёр на позицию прораба',ro:'Stagiar supervizor șantier'},
     pay:'£2,400/mo',
@@ -496,7 +578,16 @@ function setLang(newLang){
   document.getElementById('contactBtnPage').textContent = t.contactBtn;
   document.getElementById('aboutTitle').textContent = t.aboutTitle;
   document.getElementById('aboutBody').textContent = t.aboutBody;
+  document.getElementById('warnTitle').textContent = t.warnTitle;
+  document.getElementById('warnBody').textContent = t.warnBody;
   document.getElementById('reviewsTitle').textContent = t.reviewsTitle;
+  document.getElementById('splashTitle').textContent = t.splashTitle;
+  document.getElementById('splashSub').textContent = t.splashSub;
+  document.getElementById('splashStartLabel').textContent = t.splashStartLabel;
+  document.getElementById('splashTagDE').textContent = t.optGermany;
+  document.getElementById('splashTagUK').textContent = t.optUK;
+
+  renderQuickChips();
 
   langSwitch.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
 
@@ -542,6 +633,24 @@ function renderFilterSheet(){
   badge.style.display = count > 0 ? 'flex' : 'none';
   badge.textContent = count;
 }
+
+function renderQuickChips(){
+  const t = UI[lang];
+  const el = document.getElementById('quickChips');
+  const opts = [{value:'all',label:t.optAll},{value:'DE',label:t.optGermany},{value:'UK',label:t.optUK}];
+  el.innerHTML = '';
+  opts.forEach(opt => {
+    const b = document.createElement('button');
+    b.textContent = opt.label;
+    if (filters.country === opt.value) b.classList.add('active');
+    b.onclick = () => { filters.country = opt.value; renderQuickChips(); renderFilterSheet(); renderList(); };
+    el.appendChild(b);
+  });
+}
+
+document.getElementById('splashStart').onclick = () => {
+  document.getElementById('screen-splash').classList.add('hidden');
+};
 
 document.getElementById('openFilters').onclick = () => filterSheet.classList.add('open');
 document.getElementById('applyFiltersBtn').onclick = () => { filterSheet.classList.remove('open'); renderList(); };
@@ -593,6 +702,7 @@ function renderList(){
         <div class="tags">${j.tags[lang].map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
         <div class="deadline">${t.deadlineLabel}: ${formatDeadline(j.deadline)}</div>
       </div>
+      <div class="chevron">›</div>
     `;
     el.onclick = () => openDetail(j);
     listEl.appendChild(el);
