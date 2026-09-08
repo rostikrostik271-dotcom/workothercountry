@@ -3,182 +3,176 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OVERSEAS JOBS</title>
+<title>Overseas Jobs</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   :root{
-    --black:#0d0d0b; --panel:#17170f; --khaki:#a8a06a; --khaki-dim:#6f6a48;
-    --off-white:#ece8dd; --line:#2c2b22;
+    --bg:#F7F8F7; --surface:#FFFFFF; --primary:#263338; --accent:#4CAF7D;
+    --accent-soft:#E3F3EA; --accent-dark:#3D9468; --text-secondary:#78909C;
+    --border:#E7EBEF; --danger:#E4664B;
   }
-  *{ box-sizing:border-box; }
-  body{ margin:0; background:var(--black); color:var(--off-white);
-    font-family:'Oswald',sans-serif; -webkit-font-smoothing:antialiased; }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body{ margin:0; background:var(--bg); color:var(--primary);
+    font-family:'Manrope',sans-serif; -webkit-font-smoothing:antialiased; }
 
-  header{ padding:22px 18px 14px; border-bottom:2px solid var(--khaki);
-    display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
-  header h1{ margin:0 0 4px; font-family:'Archivo Black',sans-serif; font-size:22px;
-    letter-spacing:1px; text-transform:uppercase; }
-  header p{ margin:0; font-family:'JetBrains Mono',monospace; font-size:11px;
-    letter-spacing:1.5px; text-transform:uppercase; color:var(--khaki); }
+  header{ padding:20px 18px 14px; display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+  header h1{ margin:0 0 3px; font-size:20px; font-weight:800; letter-spacing:-0.3px; }
+  header p{ margin:0; font-size:12px; color:var(--text-secondary); font-weight:500; }
   .lang-switch{ display:flex; gap:4px; flex:none; margin-top:2px; }
-  .lang-switch button{ border:1px solid var(--khaki-dim); background:transparent; color:var(--khaki-dim);
-    font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; letter-spacing:0.5px;
-    padding:5px 9px; border-radius:2px; cursor:pointer; }
-  .lang-switch button.active{ background:var(--khaki); border-color:var(--khaki); color:var(--black); }
-
-  /* Main nav tabs */
-  .main-nav{ display:flex; border-bottom:1px solid var(--line); }
-  .main-nav button{ flex:1; background:none; border:none; padding:13px 6px;
-    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; text-transform:uppercase;
-    color:var(--khaki-dim); cursor:pointer; border-bottom:2px solid transparent; }
-  .main-nav button.active{ color:var(--khaki); border-bottom-color:var(--khaki); }
+  .lang-switch button{ border:1px solid var(--border); background:var(--surface); color:var(--text-secondary);
+    font-size:11px; font-weight:700; padding:5px 9px; border-radius:8px; cursor:pointer; }
+  .lang-switch button.active{ background:var(--accent); border-color:var(--accent); color:#fff; }
 
   .screen{ display:none; }
   .screen.active{ display:block; }
+  #app{ padding-bottom:78px; }
 
   /* Stat strip */
-  .stat-strip{ display:flex; border-bottom:1px solid var(--line);
-    background: repeating-linear-gradient(135deg, var(--panel), var(--panel) 10px, #1c1c12 10px, #1c1c12 20px); }
-  .stat-strip div{ flex:1; text-align:center; padding:14px 6px; border-right:1px solid var(--line); }
+  .stat-strip{ display:flex; margin:0 18px 14px; background:var(--surface); border-radius:14px;
+    border:1px solid var(--border); overflow:hidden; }
+  .stat-strip div{ flex:1; text-align:center; padding:14px 6px; border-right:1px solid var(--border); }
   .stat-strip div:last-child{ border-right:none; }
-  .stat-strip .num{ font-family:'Archivo Black',sans-serif; font-size:18px; color:var(--khaki); }
-  .stat-strip .lbl{ font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px;
-    text-transform:uppercase; color:var(--khaki-dim); margin-top:2px; }
-
-  /* Featured job */
-  .job.featured{ border-left-width:5px; position:relative;
-    background: linear-gradient(135deg, var(--panel) 0%, #1e1d12 100%); }
-  .job.featured .badge{ position:absolute; top:-1px; right:-1px; background:var(--khaki); color:var(--black);
-    font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:700; letter-spacing:1px; padding:4px 8px; }
-
-  /* Reviews */
-  .review{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--khaki);
-    padding:16px; margin-bottom:12px; }
-  .review .stars{ color:var(--khaki); font-size:14px; letter-spacing:2px; margin-bottom:8px; }
-  .review .quote{ font-size:14px; line-height:1.55; color:var(--off-white); margin-bottom:10px; }
-  .review .author{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--khaki-dim);
-    letter-spacing:0.5px; text-transform:uppercase; }
+  .stat-strip .num{ font-size:18px; font-weight:800; color:var(--accent); }
+  .stat-strip .lbl{ font-size:9px; color:var(--text-secondary); margin-top:2px; font-weight:600;
+    text-transform:uppercase; letter-spacing:0.3px; }
 
   /* Search */
-  .search-bar{ padding:12px 18px 0; }
-  .search-bar input{ width:100%; background:var(--panel); border:1px solid var(--line); color:var(--off-white);
-    padding:11px 12px; font-size:14px; font-family:'Oswald',sans-serif; }
-  .search-bar input::placeholder{ color:var(--khaki-dim); }
-  .search-bar input:focus{ outline:none; border-color:var(--khaki); }
+  .search-bar{ padding:0 18px 12px; }
+  .search-bar input{ width:100%; background:var(--surface); border:1px solid var(--border); color:var(--primary);
+    padding:12px 14px; font-size:14px; font-family:'Manrope',sans-serif; border-radius:12px; }
+  .search-bar input::placeholder{ color:var(--text-secondary); }
+  .search-bar input:focus{ outline:none; border-color:var(--accent); }
 
-  /* Job status */
-  .job .status{ font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:700; letter-spacing:0.5px;
-    text-transform:uppercase; padding:3px 7px; border-radius:2px; }
-  .job .status.open{ background:var(--khaki); color:var(--black); }
-  .job .status.closed{ background:var(--line); color:var(--khaki-dim); }
-  .job .deadline{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--khaki-dim); margin-top:6px; }
+  /* Filters */
+  .filters-bar{ display:flex; align-items:center; justify-content:space-between; padding:0 18px 14px; }
+  .filters-bar button{ border:1px solid var(--border); background:var(--surface); color:var(--primary);
+    font-size:12px; font-weight:700; padding:9px 14px; border-radius:20px; cursor:pointer;
+    display:flex; align-items:center; gap:6px; }
+  .filters-bar .count{ background:var(--accent); color:#fff; border-radius:50%; width:16px; height:16px;
+    font-size:10px; display:flex; align-items:center; justify-content:center; font-weight:700; }
+  .filters-bar .result-count{ font-size:12px; color:var(--text-secondary); font-weight:600; }
 
-  /* Map */
-  #map{ height:calc(100vh - 230px); width:100%; filter: grayscale(0.3) invert(0.92) contrast(0.9); }
-  .leaflet-popup-content-wrapper{ background:var(--panel) !important; color:var(--off-white) !important;
-    border-radius:2px !important; }
-  .leaflet-popup-content{ font-family:'Oswald',sans-serif !important; font-size:13px !important; }
-  .leaflet-popup-tip{ background:var(--panel) !important; }
-
-  /* Filters bar */
-  .filters-bar{ display:flex; align-items:center; justify-content:space-between;
-    padding:12px 18px; border-bottom:1px solid var(--line); }
-  .filters-bar button{ border:1px solid var(--khaki); background:transparent; color:var(--khaki);
-    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; text-transform:uppercase;
-    padding:8px 14px; border-radius:2px; cursor:pointer; display:flex; align-items:center; gap:6px; }
-  .filters-bar .count{ background:var(--khaki); color:var(--black); border-radius:50%;
-    width:16px; height:16px; font-size:10px; display:flex; align-items:center; justify-content:center; }
-  .filters-bar .result-count{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--khaki-dim); }
-
-  #list{ padding:14px 18px 30px; display:flex; flex-direction:column; gap:10px; }
-  .job{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--khaki);
-    padding:14px 16px; cursor:pointer; }
+  #list{ padding:0 18px 20px; display:flex; flex-direction:column; gap:12px; }
+  .job{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:14px;
+    cursor:pointer; display:flex; gap:12px; }
+  .job.featured{ border:1.5px solid var(--accent); box-shadow:0 2px 12px rgba(76,175,125,0.12); }
+  .job .thumb{ width:52px; height:52px; border-radius:12px; flex:none; display:flex; align-items:center;
+    justify-content:center; font-size:22px; }
+  .job .info{ flex:1; min-width:0; }
   .job .row{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-  .job h3{ margin:0 0 4px; font-size:16px; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; }
-  .job .meta{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--khaki-dim); letter-spacing:0.5px; }
-  .job .pay{ font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; color:var(--khaki); white-space:nowrap; }
-  .job .tags{ margin-top:10px; display:flex; gap:6px; flex-wrap:wrap; }
-  .job .tag{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.5px; text-transform:uppercase;
-    border:1px solid var(--khaki-dim); color:var(--khaki); padding:3px 8px; border-radius:2px; }
-  .empty-state{ padding:40px 18px; text-align:center; font-family:'JetBrains Mono',monospace;
-    font-size:12px; color:var(--khaki-dim); letter-spacing:0.5px; }
+  .job h3{ margin:0 0 3px; font-size:15px; font-weight:700; }
+  .job .meta{ font-size:12px; color:var(--text-secondary); font-weight:500; }
+  .job .pay{ font-size:13px; font-weight:800; color:var(--accent-dark); white-space:nowrap; }
+  .job .tags{ margin-top:8px; display:flex; gap:6px; flex-wrap:wrap; }
+  .job .tag{ font-size:10px; font-weight:700; background:var(--accent-soft); color:var(--accent-dark);
+    padding:4px 9px; border-radius:20px; }
+  .job .status{ font-size:9px; font-weight:800; padding:3px 8px; border-radius:20px; text-transform:uppercase; }
+  .job .status.open{ background:var(--accent-soft); color:var(--accent-dark); }
+  .job .status.closed{ background:#EEF1F0; color:var(--text-secondary); }
+  .job .deadline{ font-size:10px; color:var(--text-secondary); margin-top:6px; font-weight:500; }
+  .job .badge{ position:absolute; top:-8px; left:12px; background:var(--accent); color:#fff;
+    font-size:9px; font-weight:800; padding:3px 9px; border-radius:20px; text-transform:uppercase; }
+  .job{ position:relative; margin-top:6px; }
+  .empty-state{ padding:40px 18px; text-align:center; font-size:13px; color:var(--text-secondary); font-weight:500; }
 
-  /* Contact / About static screens */
-  .static-page{ padding:24px 18px; }
-  .static-page h2{ font-family:'Archivo Black',sans-serif; font-size:19px; text-transform:uppercase;
-    letter-spacing:0.5px; margin:0 0 14px; }
-  .static-page p{ font-size:14px; line-height:1.6; color:var(--off-white); margin:0 0 18px; }
-  .static-page a.contact-btn{ display:inline-block; background:var(--khaki); color:var(--black);
-    font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; letter-spacing:1px;
-    text-transform:uppercase; padding:13px 20px; border-radius:2px; text-decoration:none; }
+  /* Static pages (Contact / About) */
+  .static-page{ padding:22px 18px; }
+  .static-page h2{ font-size:18px; font-weight:800; margin:0 0 12px; }
+  .static-page p{ font-size:14px; line-height:1.6; color:var(--primary); margin:0 0 16px; }
+  .static-page .divider{ height:1px; background:var(--border); margin:20px 0; }
+  .static-page a.contact-btn{ display:inline-block; background:var(--accent); color:#fff; font-size:14px;
+    font-weight:700; padding:13px 22px; border-radius:14px; text-decoration:none; }
+  .trust-banner{ display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--border);
+    border-radius:14px; padding:14px; margin:0 18px 14px; }
+  .trust-banner .icon{ width:38px; height:38px; border-radius:10px; background:var(--accent-soft);
+    display:flex; align-items:center; justify-content:center; flex:none; font-size:18px; }
+  .trust-banner .title{ font-size:13px; font-weight:700; }
+  .trust-banner .sub{ font-size:11px; color:var(--text-secondary); font-weight:500; }
+
+  /* Reviews */
+  .review{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:12px; }
+  .review .stars{ color:#F5A623; font-size:14px; letter-spacing:2px; margin-bottom:8px; }
+  .review .quote{ font-size:14px; line-height:1.55; color:var(--primary); margin-bottom:10px; }
+  .review .author{ font-size:12px; color:var(--text-secondary); font-weight:700; }
 
   /* Filter sheet */
-  .sheet-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.75); display:none;
+  .sheet-overlay{ position:fixed; inset:0; background:rgba(38,51,56,.45); display:none;
     align-items:flex-end; z-index:30; }
   .sheet-overlay.open{ display:flex; }
-  .sheet{ background:var(--panel); width:100%; border-top:2px solid var(--khaki);
-    padding:20px 18px 24px; max-height:82vh; overflow-y:auto; }
-  .sheet h3{ margin:0 0 18px; font-family:'Archivo Black',sans-serif; font-size:16px;
-    text-transform:uppercase; letter-spacing:0.5px; }
+  .sheet{ background:var(--surface); width:100%; border-radius:20px 20px 0 0; padding:22px 18px 26px;
+    max-height:82vh; overflow-y:auto; }
+  .sheet h3{ margin:0 0 18px; font-size:16px; font-weight:800; }
   .filter-group{ margin-bottom:20px; }
-  .filter-group .label{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.5px;
-    text-transform:uppercase; color:var(--khaki-dim); margin-bottom:8px; }
+  .filter-group .label{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;
+    color:var(--text-secondary); margin-bottom:9px; }
   .pill-row{ display:flex; gap:8px; flex-wrap:wrap; }
-  .pill-row button{ border:1px solid var(--khaki-dim); background:transparent; color:var(--khaki);
-    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.5px; text-transform:uppercase;
-    padding:9px 14px; border-radius:2px; cursor:pointer; display:flex; align-items:center; gap:6px; }
-  .pill-row button.active{ background:var(--khaki); border-color:var(--khaki); color:var(--black); font-weight:600; }
-  .pill-row button svg{ width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.6; }
-  .sheet .apply-filters{ width:100%; padding:14px; border:none; background:var(--khaki); color:var(--black);
-    font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; letter-spacing:1px;
-    text-transform:uppercase; cursor:pointer; margin-top:6px; }
+  .pill-row button{ border:1px solid var(--border); background:var(--bg); color:var(--primary);
+    font-size:13px; font-weight:600; padding:10px 15px; border-radius:20px; cursor:pointer;
+    display:flex; align-items:center; gap:6px; }
+  .pill-row button.active{ background:var(--accent); border-color:var(--accent); color:#fff; font-weight:700; }
+  .pill-row button svg{ width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.8; }
+  .sheet .apply-filters{ width:100%; padding:15px; border:none; background:var(--accent); color:#fff;
+    font-size:14px; font-weight:700; border-radius:14px; cursor:pointer; margin-top:6px; }
 
   /* Detail overlay */
-  #detail{ position:fixed; inset:0; background:var(--black); transform:translateX(100%);
+  #detail{ position:fixed; inset:0; background:var(--bg); transform:translateX(100%);
     transition:transform .22s ease; overflow-y:auto; z-index:10; }
   #detail.open{ transform:translateX(0); }
-  #detail .top{ padding:18px; border-bottom:2px solid var(--khaki); display:flex; align-items:center; gap:12px; }
-  #detail .top button{ border:1px solid var(--khaki-dim); background:none; font-size:16px; cursor:pointer;
-    color:var(--khaki); padding:4px 10px; font-family:'JetBrains Mono',monospace; }
-  #detail .top strong{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1.5px;
-    text-transform:uppercase; color:var(--khaki-dim); }
-  #detail .body{ padding:20px 18px 110px; }
-  #detail h2{ margin:0 0 8px; font-family:'Archivo Black',sans-serif; font-size:21px;
-    text-transform:uppercase; letter-spacing:0.5px; }
-  #detail .meta-line{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--khaki-dim);
-    margin-bottom:16px; letter-spacing:0.5px; }
-  #detail .pay-box{ background:var(--khaki); color:var(--black); padding:10px 14px;
-    font-family:'JetBrains Mono',monospace; font-weight:600; display:inline-block; margin-bottom:18px; letter-spacing:0.5px; }
-  #detail .desc{ font-size:14px; line-height:1.6; color:var(--off-white); white-space:pre-line; }
+  #detail .top{ padding:18px; background:var(--surface); border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:12px; }
+  #detail .top button{ border:1px solid var(--border); background:var(--bg); font-size:16px; cursor:pointer;
+    color:var(--primary); padding:6px 12px; border-radius:10px; }
+  #detail .top strong{ font-size:13px; font-weight:700; color:var(--text-secondary); }
+  #detail .body{ padding:22px 18px 120px; }
+  #detail h2{ margin:0 0 8px; font-size:20px; font-weight:800; }
+  #detail .meta-line{ font-size:13px; color:var(--text-secondary); margin-bottom:16px; font-weight:500; }
+  #detail .pay-box{ background:var(--accent-soft); color:var(--accent-dark); padding:11px 16px; border-radius:12px;
+    font-weight:800; display:inline-block; margin-bottom:18px; font-size:14px; }
+  #detail .desc{ font-size:14px; line-height:1.65; color:var(--primary); white-space:pre-line; }
 
-  #applyBar{ position:fixed; left:0; right:0; bottom:0; background:var(--black); border-top:2px solid var(--khaki);
+  #applyBar{ position:fixed; left:0; right:0; bottom:0; background:var(--surface); border-top:1px solid var(--border);
     padding:12px 18px; z-index:11; display:flex; gap:8px; }
-  #applyBar button{ flex:1; padding:14px 8px; border:none; font-family:'JetBrains Mono',monospace;
-    font-size:12px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; cursor:pointer; }
-  #applyBtn{ background:var(--khaki); color:var(--black); }
-  #cvBtn{ background:transparent; border:1px solid var(--khaki) !important; color:var(--khaki); }
+  #applyBar button{ flex:1; padding:15px 8px; border:none; font-size:13px; font-weight:700;
+    border-radius:14px; cursor:pointer; }
+  #applyBtn{ background:var(--accent); color:#fff; }
+  #cvBtn{ background:var(--bg); border:1px solid var(--border) !important; color:var(--primary); }
 
-  #applyForm{ position:fixed; inset:0; background:rgba(0,0,0,.75); display:none; align-items:flex-end; z-index:20; }
+  #applyForm{ position:fixed; inset:0; background:rgba(38,51,56,.45); display:none; align-items:flex-end; z-index:20; }
   #applyForm.open{ display:flex; }
-  #applyForm .sheet-inner{ background:var(--panel); width:100%; border-top:2px solid var(--khaki);
-    padding:22px 18px 26px; max-height:80vh; overflow-y:auto; }
-  #applyForm h3{ margin:0 0 16px; font-family:'Archivo Black',sans-serif; font-size:16px;
-    text-transform:uppercase; letter-spacing:0.5px; }
-  #applyForm label{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px;
-    text-transform:uppercase; color:var(--khaki-dim); display:block; margin:14px 0 5px; }
-  #applyForm input, #applyForm textarea{ width:100%; background:var(--black); border:1px solid var(--line);
-    color:var(--off-white); padding:11px; font-size:14px; font-family:'Oswald',sans-serif; resize:vertical; }
-  #applyForm input:focus, #applyForm textarea:focus{ outline:none; border-color:var(--khaki); }
-  #applyForm .send{ margin-top:20px; width:100%; padding:14px; border:none; background:var(--khaki); color:var(--black);
-    font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; letter-spacing:1px;
-    text-transform:uppercase; cursor:pointer; }
+  #applyForm .sheet-inner{ background:var(--surface); width:100%; border-radius:20px 20px 0 0;
+    padding:24px 18px 28px; max-height:80vh; overflow-y:auto; }
+  #applyForm h3{ margin:0 0 16px; font-size:16px; font-weight:800; }
+  #applyForm label{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;
+    color:var(--text-secondary); display:block; margin:14px 0 6px; }
+  #applyForm input, #applyForm textarea{ width:100%; background:var(--bg); border:1px solid var(--border);
+    color:var(--primary); padding:12px; font-size:14px; font-family:'Manrope',sans-serif; border-radius:12px; resize:vertical; }
+  #applyForm input:focus, #applyForm textarea:focus{ outline:none; border-color:var(--accent); }
+  #applyForm .send{ margin-top:20px; width:100%; padding:15px; border:none; background:var(--accent); color:#fff;
+    font-size:14px; font-weight:700; border-radius:14px; cursor:pointer; }
+
+  /* Bottom nav */
+  .bottom-nav{ position:fixed; left:0; right:0; bottom:0; background:var(--surface); border-top:1px solid var(--border);
+    display:flex; padding:8px 4px calc(8px + env(safe-area-inset-bottom)); z-index:15; }
+  .bottom-nav.hidden{ display:none; }
+  .bottom-nav button{ flex:1; background:none; border:none; display:flex; flex-direction:column;
+    align-items:center; gap:3px; padding:6px 2px; cursor:pointer; color:var(--text-secondary); }
+  .bottom-nav button svg{ width:21px; height:21px; fill:none; stroke:currentColor; stroke-width:1.8; }
+  .bottom-nav button span{ font-size:9.5px; font-weight:700; }
+  .bottom-nav button.active{ color:var(--accent); }
+
+  /* Map */
+  #map{ height:calc(100vh - 200px); width:100%; }
+  .leaflet-popup-content-wrapper{ border-radius:12px !important; }
+  .leaflet-popup-content{ font-family:'Manrope',sans-serif !important; font-size:13px !important; }
 </style>
 </head>
 <body>
+
+<div id="app">
 
 <header>
   <div>
@@ -192,32 +186,35 @@
   </div>
 </header>
 
-<div class="main-nav" id="mainNav">
-  <button data-tab="jobs">Jobs</button>
-  <button data-tab="map">Map</button>
-  <button data-tab="reviews">Reviews</button>
-  <button data-tab="contact">Contact</button>
-  <button data-tab="about">About</button>
-</div>
-
-<div class="stat-strip">
-  <div><div class="num">50+</div><div class="lbl" id="statJobs">Live jobs</div></div>
-  <div><div class="num">2</div><div class="lbl" id="statCountries">Countries</div></div>
-  <div><div class="num">0%</div><div class="lbl" id="statFees">Fees to apply</div></div>
-</div>
-
 <!-- JOBS SCREEN -->
 <div class="screen active" id="screen-jobs">
+  <div class="stat-strip">
+    <div><div class="num">50+</div><div class="lbl" id="statJobs">Live jobs</div></div>
+    <div><div class="num">2</div><div class="lbl" id="statCountries">Countries</div></div>
+    <div><div class="num">0%</div><div class="lbl" id="statFees">Fees to apply</div></div>
+  </div>
+
+  <div class="trust-banner">
+    <div class="icon">✓</div>
+    <div>
+      <div class="title" id="trustTitle">Verified employers</div>
+      <div class="sub" id="trustSub">We only work with reliable companies</div>
+    </div>
+  </div>
+
   <div class="search-bar">
     <input type="text" id="searchInput" placeholder="Search by title or country...">
   </div>
+
   <div class="filters-bar">
     <button id="openFilters">
+      <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
       <span id="filtersLabel">Filters</span>
       <span class="count" id="filterCount" style="display:none;">0</span>
     </button>
     <span class="result-count" id="resultCount"></span>
   </div>
+
   <div id="list"></div>
 </div>
 
@@ -234,48 +231,60 @@
   <div id="reviewsList" style="padding:0 18px 24px;"></div>
 </div>
 
-<!-- CONTACT SCREEN -->
+<!-- CONTACT SCREEN (includes About) -->
 <div class="screen" id="screen-contact">
   <div class="static-page">
     <h2 id="contactTitle">Contact</h2>
     <p id="contactBody">Have a question about a vacancy, or want to send your CV directly? Message us anytime.</p>
     <a class="contact-btn" id="contactBtnPage" href="https://t.me/ceostap16" target="_blank">Message @ceostap16</a>
-  </div>
-</div>
-
-<!-- ABOUT SCREEN -->
-<div class="screen" id="screen-about">
-  <div class="static-page">
+    <div class="divider"></div>
     <h2 id="aboutTitle">About us</h2>
     <p id="aboutBody"></p>
   </div>
+</div>
+
+</div><!-- /#app -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav" id="mainNav">
+  <button data-tab="jobs" class="active">
+    <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+    <span id="navJobs">Vacancies</span>
+  </button>
+  <button data-tab="map">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+    <span id="navMap">Countries</span>
+  </button>
+  <button data-tab="reviews">
+    <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+    <span id="navReviews">Reviews</span>
+  </button>
+  <button data-tab="contact">
+    <svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3z"/></svg>
+    <span id="navContact">Support</span>
+  </button>
 </div>
 
 <!-- FILTER SHEET -->
 <div class="sheet-overlay" id="filterSheet">
   <div class="sheet">
     <h3 id="filterSheetTitle">Filter jobs</h3>
-
     <div class="filter-group">
       <div class="label" id="labelCountry">Country</div>
       <div class="pill-row" id="rowCountry"></div>
     </div>
-
     <div class="filter-group">
       <div class="label" id="labelEmployment">Employment type</div>
       <div class="pill-row" id="rowEmployment"></div>
     </div>
-
     <div class="filter-group">
       <div class="label" id="labelFormat">Work format</div>
       <div class="pill-row" id="rowFormat"></div>
     </div>
-
     <div class="filter-group">
       <div class="label" id="labelGoal">Looking for</div>
       <div class="pill-row" id="rowGoal"></div>
     </div>
-
     <button class="apply-filters" id="applyFiltersBtn">Show results</button>
   </div>
 </div>
@@ -311,213 +320,138 @@ const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 
 const CONTACT_USERNAME = 'ceostap16';
+const FORMSPREE_URL = 'PASTE_YOUR_FORMSPREE_URL_HERE';
 
 let lang = 'en';
 let activeTab = 'jobs';
 let currentJob = null;
-
-// ---------- filter state ----------
 const filters = { country:'all', employment:'all', format:'all', goal:'all' };
 
-const ICONS = {
-  remote: '<svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9h14v-9"/></svg>',
-  onsite: '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M9 21v-4h6v4"/><path d="M8 7h1M15 7h1M8 11h1M15 11h1"/></svg>'
+const FLAGS = { UK:'🇬🇧', DE:'🇩🇪' };
+const CATEGORY_ICON = { Logistics:'📦', Hospitality:'🛎️', Manufacturing:'⚙️', Support:'💬', Construction:'🏗️' };
+const CATEGORY_COLOR = {
+  Logistics:'#E3F3EA', Hospitality:'#FDEEE0', Manufacturing:'#E6EEF7', Support:'#F1E8FB', Construction:'#FCEBE9'
 };
 
-const FLAGS = { UK: '🇬🇧', DE: '🇩🇪' };
+const ICONS = {
+  remote:'<svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9h14v-9"/></svg>',
+  onsite:'<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18"/><path d="M9 21v-4h6v4"/></svg>'
+};
 
 const REVIEWS = [
-  {
-    name: { en:'Andrei, 27', ru:'Андрей, 27', ro:'Andrei, 27' },
-    country: { en:'placed in Germany', ru:'устроился в Германии', ro:'angajat în Germania' },
-    stars: 5,
-    text: {
-      en:'Applied on a Sunday, had a reply by Tuesday. The warehouse job was exactly as described — no surprises with the contract.',
-      ru:'Откликнулся в воскресенье, ответили уже во вторник. Работа на складе оказалась именно такой, как в описании — никаких сюрпризов с контрактом.',
-      ro:'Am aplicat duminică, am primit răspuns marți. Jobul la depozit a fost exact cum a fost descris — fără surprize la contract.'
-    }
-  },
-  {
-    name: { en:'Maria, 31', ru:'Мария, 31', ro:'Maria, 31' },
-    country: { en:'placed in the UK', ru:'устроилась в Англии', ro:'angajată în Anglia' },
-    stars: 5,
-    text: {
-      en:'I sent my CV through the chat and got a call two days later. Six months in and the accommodation part turned out to be true too.',
-      ru:'Отправила резюме прямо в чат, через два дня позвонили. Уже полгода работаю, и с жильём тоже всё оказалось честно.',
-      ro:'Am trimis CV-ul direct în chat și am primit un apel două zile mai târziu. Sunt deja de șase luni acolo, iar partea cu cazarea a fost și ea adevărată.'
-    }
-  },
-  {
-    name: { en:'Ion, 24', ru:'Ион, 24', ro:'Ion, 24' },
-    country: { en:'placed in Germany', ru:'устроился в Германии', ro:'angajat în Germania' },
-    stars: 4,
-    text: {
-      en:'Good communication throughout the process. Took a bit longer than expected to get the contract, but everything was legit.',
-      ru:'Хорошая связь на всех этапах. Контракт оформили чуть дольше, чем ожидал, но всё оказалось честно.',
-      ro:'Comunicare bună pe tot parcursul. A durat puțin mai mult decât mă așteptam pentru contract, dar totul a fost legitim.'
-    }
-  }
+  { name:{en:'Andrei, 27',ru:'Андрей, 27',ro:'Andrei, 27'}, country:{en:'placed in Germany',ru:'устроился в Германии',ro:'angajat în Germania'}, stars:5,
+    text:{ en:'Applied on a Sunday, had a reply by Tuesday. The warehouse job was exactly as described.',
+           ru:'Откликнулся в воскресенье, ответили уже во вторник. Работа на складе оказалась именно такой, как в описании.',
+           ro:'Am aplicat duminică, am primit răspuns marți. Jobul a fost exact cum a fost descris.' } },
+  { name:{en:'Maria, 31',ru:'Мария, 31',ro:'Maria, 31'}, country:{en:'placed in the UK',ru:'устроилась в Англии',ro:'angajată în Anglia'}, stars:5,
+    text:{ en:'I sent my CV through the chat and got a call two days later. Six months in and going well.',
+           ru:'Отправила резюме прямо в чат, через два дня позвонили. Уже полгода работаю, всё хорошо.',
+           ro:'Am trimis CV-ul direct în chat și am primit un apel două zile mai târziu. Sunt deja de șase luni acolo.' } },
+  { name:{en:'Ion, 24',ru:'Ион, 24',ro:'Ion, 24'}, country:{en:'placed in Germany',ru:'устроился в Германии',ro:'angajat în Germania'}, stars:4,
+    text:{ en:'Good communication throughout. Took a bit longer than expected, but everything was legit.',
+           ru:'Хорошая связь на всех этапах. Оформили чуть дольше, чем ожидал, но всё честно.',
+           ro:'Comunicare bună pe tot parcursul. A durat puțin mai mult, dar totul a fost legitim.' } }
 ];
 
 const UI = {
-  en: {
-    title:'Overseas Jobs', subtitle:'Vacancies abroad — updated weekly',
-    tabJobs:'Jobs', tabContact:'Contact', tabAbout:'About', tabReviews:'Reviews',
+  en: { title:'Overseas Jobs', subtitle:'Vacancies abroad — updated weekly',
+    navJobs:'Vacancies', navMap:'Countries', navReviews:'Reviews', navContact:'Support',
     statJobs:'Live jobs', statCountries:'Countries', statFees:'Fees to apply',
-    reviewsTitle:'What people say', featured:'Featured',
-    searchPlaceholder:'Search by title or country...',
-    statusOpen:'Open', statusClosed:'Closed', deadlineLabel:'Apply by',
+    trustTitle:'Verified employers', trustSub:'We only work with reliable companies',
+    searchPlaceholder:'Search by title or country...', filters:'Filters', showResults:'Show results',
+    filterSheetTitle:'Filter jobs', labelCountry:'Country', labelEmployment:'Employment type',
+    labelFormat:'Work format', labelGoal:'Looking for',
+    optAll:'All', optUK:'UK', optGermany:'Germany', optFullTime:'Full-time', optPartTime:'Part-time',
+    optRemote:'Remote', optOnsite:'On-site', optAnyJob:'Any job', optCareerGrowth:'Career growth',
+    resultsFound:(n)=>`${n} jobs`, noResults:'No vacancies match these filters yet.',
+    jobDetails:'Job details', applyNow:'Apply now', sendCv:'Send CV', sendApplication:'Send application',
+    fullName:'Full name', contact:'Contact (phone or email)', message:'Message (optional)',
+    fillRequired:'Please fill in your name and contact.', demoAlert:'Application (demo, outside Telegram):\n',
     sendError:'Could not send — please message us directly instead.', sending:'Sending...',
-    filters:'Filters', showResults:'Show results',
-    filterSheetTitle:'Filter jobs',
-    labelCountry:'Country', labelEmployment:'Employment type', labelFormat:'Work format', labelGoal:'Looking for',
-    optAll:'All', optUK:'UK', optGermany:'Germany',
-    optFullTime:'Full-time', optPartTime:'Part-time',
-    optRemote:'Remote', optOnsite:'On-site',
-    optAnyJob:'Any job', optCareerGrowth:'Career growth',
-    resultsFound: (n)=>`${n} jobs`,
-    noResults:'No vacancies match these filters yet.',
-    jobDetails:'Job details', applyNow:'Apply now', sendCv:'Send CV',
-    sendApplication:'Send application', fullName:'Full name',
-    contact:'Contact (phone or email)', message:'Message (optional)',
-    fillRequired:'Please fill in your name and contact.',
-    demoAlert:'Application (demo, outside Telegram):\n', thanks:'Thanks! Application sent',
+    statusOpen:'Open', statusClosed:'Closed', deadlineLabel:'Apply by', featured:'Featured',
+    reviewsTitle:'What people say',
     contactTitle:'Contact', contactBody:'Have a question about a vacancy, or want to send your CV directly? Message us anytime.',
-    contactBtn:'Message @' + CONTACT_USERNAME,
+    contactBtn:'Message @'+CONTACT_USERNAME,
     aboutTitle:'About us',
-    aboutBody:'This app is run by a small team helping people find real, verified jobs abroad. We currently list vacancies in the UK and Germany, across logistics, hospitality and manufacturing.\n\nBrowsing and applying is always free. If a listing interests you, you can apply directly through the app or send your CV to us in chat — we\'ll pass it on to the employer and get back to you.\n\nNew vacancies are added weekly.'
-  },
-  ru: {
-    title:'Работа за рубежом', subtitle:'Вакансии за границей — обновляется еженедельно',
-    tabJobs:'Работа', tabContact:'Контакт', tabAbout:'О нас', tabReviews:'Отзывы',
+    aboutBody:'This app is run by a small team helping people find real, verified jobs abroad. We currently list vacancies in the UK and Germany, across logistics, hospitality and manufacturing.\n\nBrowsing and applying is always free. If a listing interests you, apply directly through the app or send your CV in chat — we\'ll pass it on to the employer.\n\nNew vacancies are added weekly.' },
+  ru: { title:'Работа за рубежом', subtitle:'Вакансии за границей — обновляется еженедельно',
+    navJobs:'Вакансии', navMap:'Страны', navReviews:'Отзывы', navContact:'Поддержка',
     statJobs:'Активных вакансий', statCountries:'Страны', statFees:'Комиссия за отклик',
-    reviewsTitle:'Отзывы', featured:'Рекомендуем',
-    searchPlaceholder:'Поиск по названию или стране...',
-    statusOpen:'Открыто', statusClosed:'Закрыто', deadlineLabel:'Подать до',
+    trustTitle:'Проверенные работодатели', trustSub:'Работаем только с надёжными компаниями',
+    searchPlaceholder:'Поиск по должности, стране...', filters:'Фильтры', showResults:'Показать',
+    filterSheetTitle:'Фильтр вакансий', labelCountry:'Страна', labelEmployment:'Тип занятости',
+    labelFormat:'Формат работы', labelGoal:'Что вы ищете',
+    optAll:'Все', optUK:'Англия', optGermany:'Германия', optFullTime:'Полная занятость', optPartTime:'Частичная занятость',
+    optRemote:'Удалённо', optOnsite:'На месте', optAnyJob:'Любая работа', optCareerGrowth:'Карьерный рост',
+    resultsFound:(n)=>`Вакансий: ${n}`, noResults:'По этим фильтрам пока ничего не найдено.',
+    jobDetails:'О вакансии', applyNow:'Откликнуться', sendCv:'Отправить CV', sendApplication:'Отправить отклик',
+    fullName:'Полное имя', contact:'Контакт (телефон или email)', message:'Сообщение (необязательно)',
+    fillRequired:'Заполните имя и контакт.', demoAlert:'Отклик (демо, вне Telegram):\n',
     sendError:'Не удалось отправить — напишите нам напрямую.', sending:'Отправка...',
-    filters:'Фильтры', showResults:'Показать',
-    filterSheetTitle:'Фильтр вакансий',
-    labelCountry:'Страна', labelEmployment:'Тип занятости', labelFormat:'Формат работы', labelGoal:'Что вы ищете',
-    optAll:'Все', optUK:'Англия', optGermany:'Германия',
-    optFullTime:'Полная занятость', optPartTime:'Частичная занятость',
-    optRemote:'Удалённо', optOnsite:'На месте',
-    optAnyJob:'Любая работа', optCareerGrowth:'Карьерный рост',
-    resultsFound: (n)=>`Вакансий: ${n}`,
-    noResults:'По этим фильтрам пока ничего не найдено.',
-    jobDetails:'О вакансии', applyNow:'Откликнуться', sendCv:'Отправить CV',
-    sendApplication:'Отправить отклик', fullName:'Полное имя',
-    contact:'Контакт (телефон или email)', message:'Сообщение (необязательно)',
-    fillRequired:'Заполните имя и контакт.',
-    demoAlert:'Отклик (демо, вне Telegram):\n', thanks:'Спасибо! Отклик отправлен',
+    statusOpen:'Открыто', statusClosed:'Закрыто', deadlineLabel:'Подать до', featured:'Рекомендуем',
+    reviewsTitle:'Отзывы',
     contactTitle:'Контакт', contactBody:'Есть вопрос по вакансии или хотите отправить резюме напрямую? Пишите в любое время.',
-    contactBtn:'Написать @' + CONTACT_USERNAME,
+    contactBtn:'Написать @'+CONTACT_USERNAME,
     aboutTitle:'О нас',
-    aboutBody:'Это приложение ведёт небольшая команда, которая помогает находить реальные, проверенные вакансии за рубежом. Сейчас у нас есть вакансии в Англии и Германии — в логистике, гостиничном деле и на производстве.\n\nПросмотр и отклик всегда бесплатны. Если вакансия заинтересовала — можно откликнуться прямо в приложении или отправить резюме нам в чат, мы передадим его работодателю и свяжемся с вами.\n\nНовые вакансии добавляются каждую неделю.'
-  },
-  ro: {
-    title:'Locuri de muncă peste hotare', subtitle:'Oferte actualizate săptămânal',
-    tabJobs:'Joburi', tabContact:'Contact', tabAbout:'Despre noi', tabReviews:'Recenzii',
+    aboutBody:'Это приложение ведёт небольшая команда, которая помогает находить реальные, проверенные вакансии за рубежом. Сейчас у нас есть вакансии в Англии и Германии — в логистике, гостиничном деле и на производстве.\n\nПросмотр и отклик всегда бесплатны. Если вакансия заинтересовала — откликнитесь прямо в приложении или отправьте резюме нам в чат, мы передадим его работодателю.\n\nНовые вакансии добавляются каждую неделю.' },
+  ro: { title:'Locuri de muncă peste hotare', subtitle:'Oferte actualizate săptămânal',
+    navJobs:'Joburi', navMap:'Țări', navReviews:'Recenzii', navContact:'Suport',
     statJobs:'Joburi active', statCountries:'Țări', statFees:'Comision de aplicare',
-    reviewsTitle:'Ce spun oamenii', featured:'Recomandat',
-    searchPlaceholder:'Caută după titlu sau țară...',
-    statusOpen:'Deschis', statusClosed:'Închis', deadlineLabel:'Aplică până la',
+    trustTitle:'Angajatori verificați', trustSub:'Lucrăm doar cu companii de încredere',
+    searchPlaceholder:'Caută după titlu sau țară...', filters:'Filtre', showResults:'Arată rezultate',
+    filterSheetTitle:'Filtrează joburile', labelCountry:'Țară', labelEmployment:'Tip de angajare',
+    labelFormat:'Format de lucru', labelGoal:'Ce cauți',
+    optAll:'Toate', optUK:'Anglia', optGermany:'Germania', optFullTime:'Normă întreagă', optPartTime:'Normă parțială',
+    optRemote:'Remote', optOnsite:'La sediu', optAnyJob:'Orice job', optCareerGrowth:'Creștere în carieră',
+    resultsFound:(n)=>`${n} joburi`, noResults:'Niciun job nu corespunde acestor filtre încă.',
+    jobDetails:'Detalii job', applyNow:'Aplică acum', sendCv:'Trimite CV', sendApplication:'Trimite aplicația',
+    fullName:'Nume complet', contact:'Contact (telefon sau email)', message:'Mesaj (opțional)',
+    fillRequired:'Completează numele și contactul.', demoAlert:'Aplicație (demo, în afara Telegram):\n',
     sendError:'Nu s-a putut trimite — scrie-ne direct.', sending:'Se trimite...',
-    filters:'Filtre', showResults:'Arată rezultate',
-    filterSheetTitle:'Filtrează joburile',
-    labelCountry:'Țară', labelEmployment:'Tip de angajare', labelFormat:'Format de lucru', labelGoal:'Ce cauți',
-    optAll:'Toate', optUK:'Anglia', optGermany:'Germania',
-    optFullTime:'Normă întreagă', optPartTime:'Normă parțială',
-    optRemote:'Remote', optOnsite:'La sediu',
-    optAnyJob:'Orice job', optCareerGrowth:'Creștere în carieră',
-    resultsFound: (n)=>`${n} joburi`,
-    noResults:'Niciun job nu corespunde acestor filtre încă.',
-    jobDetails:'Detalii job', applyNow:'Aplică acum', sendCv:'Trimite CV',
-    sendApplication:'Trimite aplicația', fullName:'Nume complet',
-    contact:'Contact (telefon sau email)', message:'Mesaj (opțional)',
-    fillRequired:'Completează numele și contactul.',
-    demoAlert:'Aplicație (demo, în afara Telegram):\n', thanks:'Mulțumim! Aplicația a fost trimisă',
+    statusOpen:'Deschis', statusClosed:'Închis', deadlineLabel:'Aplică până la', featured:'Recomandat',
+    reviewsTitle:'Ce spun oamenii',
     contactTitle:'Contact', contactBody:'Ai o întrebare despre un job sau vrei să trimiți CV-ul direct? Scrie-ne oricând.',
-    contactBtn:'Scrie @' + CONTACT_USERNAME,
+    contactBtn:'Scrie @'+CONTACT_USERNAME,
     aboutTitle:'Despre noi',
-    aboutBody:'Această aplicație este administrată de o echipă mică ce ajută oamenii să găsească locuri de muncă reale, verificate, peste hotare. În prezent avem oferte în Anglia și Germania, în logistică, ospitalitate și producție.\n\nCăutarea și aplicarea sunt mereu gratuite. Dacă un job te interesează, poți aplica direct din aplicație sau ne poți trimite CV-ul în chat — îl transmitem angajatorului și revenim cu un răspuns.\n\nJoburi noi sunt adăugate săptămânal.'
-  }
+    aboutBody:'Această aplicație este administrată de o echipă mică ce ajută oamenii să găsească locuri de muncă reale, verificate, peste hotare. În prezent avem oferte în Anglia și Germania, în logistică, ospitalitate și producție.\n\nCăutarea și aplicarea sunt mereu gratuite. Dacă un job te interesează, aplică direct din aplicație sau trimite CV-ul în chat — îl transmitem angajatorului.\n\nJoburi noi sunt adăugate săptămânal.' }
 };
 
-// ---------- jobs data ----------
-// Replace with your real vacancies. countryCode: 'UK' or 'DE'. employment: 'full'/'part'. format: 'remote'/'onsite'. goal: 'any'/'career'.
-// lat/lng: coordinates for the Map tab. deadline: 'YYYY-MM-DD'. status: 'open' or 'closed'.
+// Replace with your real vacancies.
 const JOBS = [
-  {
-    id:'j1', countryCode:'DE', employment:'full', format:'onsite', goal:'any',
+  { id:'j1', countryCode:'DE', employment:'full', format:'onsite', goal:'any', category:'Logistics',
     lat:52.5200, lng:13.4050, deadline:'2026-10-15', status:'open',
-    country:{ en:'Germany', ru:'Германия', ro:'Germania' },
-    title:{ en:'Warehouse Operative', ru:'Работник склада', ro:'Operator depozit' },
+    country:{en:'Germany',ru:'Германия',ro:'Germania'}, title:{en:'Warehouse Operative',ru:'Работник склада',ro:'Operator depozit'},
     pay:'€2,100/mo',
-    tags:{
-      en:['Accommodation provided','No experience needed'],
-      ru:['Жильё предоставляется','Опыт не обязателен'],
-      ro:['Cazare inclusă','Fără experiență necesară']
-    },
-    desc:{
-      en:'Full-time warehouse role in a logistics hub near Berlin.\n\nDuties: picking, packing, loading.\nContract: 6 months, extendable.\nAccommodation and transport to work included.',
-      ru:'Работа на складе полный день, логистический центр рядом с Берлином.\n\nОбязанности: комплектация, упаковка, погрузка.\nКонтракт: 6 месяцев с продлением.\nЖильё и транспорт до работы включены.',
-      ro:'Post cu normă întreagă într-un hub logistic lângă Berlin.\n\nSarcini: preluare, ambalare, încărcare.\nContract: 6 luni, prelungibil.\nCazare și transport la muncă incluse.'
-    }
-  },
-  {
-    id:'j2', countryCode:'UK', employment:'part', format:'onsite', goal:'any',
+    tags:{ en:['Accommodation provided','No experience needed'], ru:['Жильё предоставляется','Опыт не обязателен'], ro:['Cazare inclusă','Fără experiență necesară'] },
+    desc:{ en:'Full-time warehouse role in a logistics hub near Berlin.\n\nDuties: picking, packing, loading.\nContract: 6 months, extendable.\nAccommodation and transport to work included.',
+           ru:'Работа на складе полный день, логистический центр рядом с Берлином.\n\nОбязанности: комплектация, упаковка, погрузка.\nКонтракт: 6 месяцев с продлением.\nЖильё и транспорт до работы включены.',
+           ro:'Post cu normă întreagă într-un hub logistic lângă Berlin.\n\nSarcini: preluare, ambalare, încărcare.\nContract: 6 luni, prelungibil.\nCazare și transport la muncă incluse.' } },
+  { id:'j2', countryCode:'UK', employment:'part', format:'onsite', goal:'any', category:'Hospitality',
     lat:51.5074, lng:-0.1278, deadline:'2026-09-30', status:'open',
-    country:{ en:'United Kingdom', ru:'Англия', ro:'Anglia' },
-    title:{ en:'Hotel Housekeeper', ru:'Горничная в отеле', ro:'Cameristă hotel' },
+    country:{en:'United Kingdom',ru:'Англия',ro:'Anglia'}, title:{en:'Hotel Housekeeper',ru:'Горничная в отеле',ro:'Cameristă hotel'},
     pay:'£1,400/mo',
-    tags:{
-      en:['Part-time','Meals included'],
-      ru:['Частичная занятость','Питание включено'],
-      ro:['Normă parțială','Masă inclusă']
-    },
-    desc:{
-      en:'Part-time housekeeping position at a hotel in London.\n\nDuties: room cleaning, laundry support.\nShifts: flexible, 20-25h/week.\nMeals included during shifts.',
-      ru:'Частичная занятость горничной в отеле в Лондоне.\n\nОбязанности: уборка номеров, помощь с прачечной.\nСмены: гибкие, 20-25ч/неделю.\nПитание включено во время смен.',
-      ro:'Post cu normă parțială de cameristă la un hotel din Londra.\n\nSarcini: curățenie camere, sprijin la spălătorie.\nTure: flexibile, 20-25h/săptămână.\nMasă inclusă în timpul turei.'
-    }
-  },
-  {
-    id:'j3', countryCode:'DE', employment:'full', format:'remote', goal:'career',
+    tags:{ en:['Part-time','Meals included'], ru:['Частичная занятость','Питание включено'], ro:['Normă parțială','Masă inclusă'] },
+    desc:{ en:'Part-time housekeeping position at a hotel in London.\n\nDuties: room cleaning, laundry support.\nShifts: flexible, 20-25h/week.\nMeals included during shifts.',
+           ru:'Частичная занятость горничной в отеле в Лондоне.\n\nОбязанности: уборка номеров, помощь с прачечной.\nСмены: гибкие, 20-25ч/неделю.\nПитание включено во время смен.',
+           ro:'Post cu normă parțială de cameristă la un hotel din Londra.\n\nSarcini: curățenie camere, sprijin la spălătorie.\nTure: flexibile, 20-25h/săptămână.\nMasă inclusă în timpul turei.' } },
+  { id:'j3', countryCode:'DE', employment:'full', format:'remote', goal:'career', category:'Support',
     lat:48.1351, lng:11.5820, deadline:'2026-11-01', status:'open',
-    country:{ en:'Germany', ru:'Германия', ro:'Germania' },
-    title:{ en:'Customer Support Specialist', ru:'Специалист поддержки клиентов', ro:'Specialist suport clienți' },
+    country:{en:'Germany',ru:'Германия',ro:'Germania'}, title:{en:'Customer Support Specialist',ru:'Специалист поддержки клиентов',ro:'Specialist suport clienți'},
     pay:'€2,300/mo',
-    tags:{
-      en:['Remote','Training provided'],
-      ru:['Удалённо','Обучение предоставляется'],
-      ro:['Remote','Instruire oferită']
-    },
-    desc:{
-      en:'Remote customer support role for a growing logistics company.\n\nDuties: handling client queries via chat and email, order tracking support.\nContract: 12 months, career growth path to team lead.\nFull training provided in the first month.',
-      ru:'Удалённая работа в поддержке клиентов растущей логистической компании.\n\nОбязанности: обработка запросов клиентов в чате и по email, помощь по отслеживанию заказов.\nКонтракт: 12 месяцев, есть карьерный рост до тимлида.\nПолное обучение в первый месяц.',
-      ro:'Post remote de suport clienți pentru o companie de logistică în creștere.\n\nSarcini: gestionarea cererilor clienților prin chat și email, suport urmărire comenzi.\nContract: 12 luni, posibilitate de creștere spre team lead.\nInstruire completă în prima lună.'
-    }
-  },
-  {
-    id:'j4', countryCode:'UK', employment:'full', format:'onsite', goal:'career',
+    tags:{ en:['Remote','Training provided'], ru:['Удалённо','Обучение предоставляется'], ro:['Remote','Instruire oferită'] },
+    desc:{ en:'Remote customer support role for a growing logistics company.\n\nDuties: handling client queries via chat and email.\nContract: 12 months, career growth path to team lead.\nFull training provided in the first month.',
+           ru:'Удалённая работа в поддержке клиентов растущей логистической компании.\n\nОбязанности: обработка запросов клиентов в чате и по email.\nКонтракт: 12 месяцев, есть карьерный рост до тимлида.\nПолное обучение в первый месяц.',
+           ro:'Post remote de suport clienți pentru o companie de logistică în creștere.\n\nSarcini: gestionarea cererilor clienților prin chat și email.\nContract: 12 luni, posibilitate de creștere spre team lead.\nInstruire completă în prima lună.' } },
+  { id:'j4', countryCode:'UK', employment:'full', format:'onsite', goal:'career', category:'Construction',
     lat:53.4808, lng:-2.2426, deadline:'2026-09-20', status:'closed',
-    country:{ en:'United Kingdom', ru:'Англия', ro:'Anglia' },
-    title:{ en:'Site Supervisor Trainee', ru:'Стажёр на позицию прораба', ro:'Stagiar supervizor șantier' },
+    country:{en:'United Kingdom',ru:'Англия',ro:'Anglia'}, title:{en:'Site Supervisor Trainee',ru:'Стажёр на позицию прораба',ro:'Stagiar supervizor șantier'},
     pay:'£2,400/mo',
-    tags:{
-      en:['Career growth','Training provided'],
-      ru:['Карьерный рост','Обучение предоставляется'],
-      ro:['Creștere în carieră','Instruire oferită']
-    },
-    desc:{
-      en:'Entry role on a construction site near Manchester with a clear path to site supervisor within 12-18 months.\n\nDuties: assisting site management, quality checks, coordination with crews.\nContract: 18 months.\nStructured training and mentorship included.',
-      ru:'Стартовая позиция на стройке рядом с Манчестером с чётким карьерным путём до прораба за 12-18 месяцев.\n\nОбязанности: помощь в управлении объектом, контроль качества, координация с бригадами.\nКонтракт: 18 месяцев.\nСтруктурированное обучение и наставничество включены.',
-      ro:'Post de start pe un șantier lângă Manchester, cu drum clar spre supervizor de șantier în 12-18 luni.\n\nSarcini: sprijin în managementul șantierului, control calitate, coordonare cu echipele.\nContract: 18 luni.\nInstruire structurată și mentorat incluse.'
-    }
-  }
+    tags:{ en:['Career growth','Training provided'], ru:['Карьерный рост','Обучение предоставляется'], ro:['Creștere în carieră','Instruire oferită'] },
+    desc:{ en:'Entry role on a construction site near Manchester with a clear path to site supervisor within 12-18 months.\n\nDuties: assisting site management, quality checks, coordination with crews.\nContract: 18 months.\nStructured training and mentorship included.',
+           ru:'Стартовая позиция на стройке рядом с Манчестером с чётким карьерным путём до прораба за 12-18 месяцев.\n\nОбязанности: помощь в управлении объектом, контроль качества, координация с бригадами.\nКонтракт: 18 месяцев.\nСтруктурированное обучение и наставничество включены.',
+           ro:'Post de start pe un șantier lângă Manchester, cu drum clar spre supervizor de șantier în 12-18 luni.\n\nSarcini: sprijin în managementul șantierului, control calitate, coordonare cu echipele.\nContract: 18 luni.\nInstruire structurată și mentorat incluse.' } }
 ];
 
-// ---------- elements ----------
 const langSwitch = document.getElementById('langSwitch');
 const mainNav = document.getElementById('mainNav');
 const listEl = document.getElementById('list');
@@ -525,25 +459,23 @@ const detailEl = document.getElementById('detail');
 const detailBody = document.getElementById('detailBody');
 const applyForm = document.getElementById('applyForm');
 const filterSheet = document.getElementById('filterSheet');
+let leafletMap = null;
 
-// ---------- language ----------
 function setLang(newLang){
   lang = newLang;
   const t = UI[lang];
-
   document.getElementById('pageTitle').textContent = t.title;
   document.getElementById('pageSubtitle').textContent = t.subtitle;
-
-  mainNav.querySelector('[data-tab="jobs"]').textContent = t.tabJobs;
-  mainNav.querySelector('[data-tab="reviews"]').textContent = t.tabReviews;
-  mainNav.querySelector('[data-tab="contact"]').textContent = t.tabContact;
-  mainNav.querySelector('[data-tab="about"]').textContent = t.tabAbout;
-
+  document.getElementById('navJobs').textContent = t.navJobs;
+  document.getElementById('navMap').textContent = t.navMap;
+  document.getElementById('navReviews').textContent = t.navReviews;
+  document.getElementById('navContact').textContent = t.navContact;
   document.getElementById('statJobs').textContent = t.statJobs;
   document.getElementById('statCountries').textContent = t.statCountries;
   document.getElementById('statFees').textContent = t.statFees;
-  document.getElementById('reviewsTitle').textContent = t.reviewsTitle;
-
+  document.getElementById('trustTitle').textContent = t.trustTitle;
+  document.getElementById('trustSub').textContent = t.trustSub;
+  document.getElementById('searchInput').placeholder = t.searchPlaceholder;
   document.getElementById('filtersLabel').textContent = t.filters;
   document.getElementById('filterSheetTitle').textContent = t.filterSheetTitle;
   document.getElementById('labelCountry').textContent = t.labelCountry;
@@ -551,8 +483,6 @@ function setLang(newLang){
   document.getElementById('labelFormat').textContent = t.labelFormat;
   document.getElementById('labelGoal').textContent = t.labelGoal;
   document.getElementById('applyFiltersBtn').textContent = t.showResults;
-  document.getElementById('searchInput').placeholder = t.searchPlaceholder;
-
   document.getElementById('detailLabel').textContent = t.jobDetails;
   document.getElementById('applyBtn').textContent = t.applyNow;
   document.getElementById('cvBtn').textContent = t.sendCv;
@@ -561,13 +491,12 @@ function setLang(newLang){
   document.getElementById('labelContact').textContent = t.contact;
   document.getElementById('labelMessage').textContent = t.message;
   document.getElementById('fSend').textContent = t.sendApplication;
-
   document.getElementById('contactTitle').textContent = t.contactTitle;
   document.getElementById('contactBody').textContent = t.contactBody;
   document.getElementById('contactBtnPage').textContent = t.contactBtn;
-
   document.getElementById('aboutTitle').textContent = t.aboutTitle;
   document.getElementById('aboutBody').textContent = t.aboutBody;
+  document.getElementById('reviewsTitle').textContent = t.reviewsTitle;
 
   langSwitch.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
 
@@ -577,41 +506,7 @@ function setLang(newLang){
   if (activeTab === 'reviews') renderReviews();
   if (activeTab === 'map' && leafletMap) { leafletMap.remove(); leafletMap = null; initMap(); }
 }
-
 langSwitch.querySelectorAll('button').forEach(b => b.onclick = () => setLang(b.dataset.lang));
-
-// ---------- map ----------
-let leafletMap = null;
-function initMap(){
-  if (leafletMap) { leafletMap.invalidateSize(); return; }
-  leafletMap = L.map('map', { zoomControl: true }).setView([50.5, 8], 4.2);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors', maxZoom: 18
-  }).addTo(leafletMap);
-
-  JOBS.forEach(j => {
-    if (!j.lat || !j.lng) return;
-    const marker = L.marker([j.lat, j.lng]).addTo(leafletMap);
-    marker.bindPopup(`<strong>${j.title[lang]}</strong><br>${j.country[lang]} · ${j.pay}`);
-  });
-}
-
-// ---------- reviews ----------
-function renderReviews(){
-  const list = document.getElementById('reviewsList');
-  list.innerHTML = '';
-  REVIEWS.forEach(r => {
-    const el = document.createElement('div');
-    el.className = 'review';
-    el.innerHTML = `
-      <div class="stars">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
-      <div class="quote">${r.text[lang]}</div>
-      <div class="author">${r.name[lang]} — ${r.country[lang]}</div>
-    `;
-    list.appendChild(el);
-  });
-}
-
 
 mainNav.querySelectorAll('button').forEach(b => {
   b.onclick = () => {
@@ -623,9 +518,7 @@ mainNav.querySelectorAll('button').forEach(b => {
     if (activeTab === 'reviews') renderReviews();
   };
 });
-mainNav.querySelector('[data-tab="jobs"]').classList.add('active');
 
-// ---------- filter sheet ----------
 function pillRow(containerId, options, filterKey){
   const el = document.getElementById(containerId);
   el.innerHTML = '';
@@ -640,44 +533,27 @@ function pillRow(containerId, options, filterKey){
 
 function renderFilterSheet(){
   const t = UI[lang];
-  pillRow('rowCountry', [
-    { value:'all', label:t.optAll }, { value:'UK', label:t.optUK }, { value:'DE', label:t.optGermany }
-  ], 'country');
-  pillRow('rowEmployment', [
-    { value:'all', label:t.optAll }, { value:'full', label:t.optFullTime }, { value:'part', label:t.optPartTime }
-  ], 'employment');
-  pillRow('rowFormat', [
-    { value:'all', label:t.optAll }, { value:'remote', label:t.optRemote, icon:'remote' }, { value:'onsite', label:t.optOnsite, icon:'onsite' }
-  ], 'format');
-  pillRow('rowGoal', [
-    { value:'any', label:t.optAnyJob }, { value:'career', label:t.optCareerGrowth }
-  ], 'goal');
-
-  const count = (filters.country!=='all'?1:0) + (filters.employment!=='all'?1:0) +
-                (filters.format!=='all'?1:0) + (filters.goal!=='any'?1:0);
+  pillRow('rowCountry', [{value:'all',label:t.optAll},{value:'UK',label:t.optUK},{value:'DE',label:t.optGermany}], 'country');
+  pillRow('rowEmployment', [{value:'all',label:t.optAll},{value:'full',label:t.optFullTime},{value:'part',label:t.optPartTime}], 'employment');
+  pillRow('rowFormat', [{value:'all',label:t.optAll},{value:'remote',label:t.optRemote,icon:'remote'},{value:'onsite',label:t.optOnsite,icon:'onsite'}], 'format');
+  pillRow('rowGoal', [{value:'any',label:t.optAnyJob},{value:'career',label:t.optCareerGrowth}], 'goal');
+  const count = (filters.country!=='all'?1:0)+(filters.employment!=='all'?1:0)+(filters.format!=='all'?1:0)+(filters.goal!=='any'?1:0);
   const badge = document.getElementById('filterCount');
   badge.style.display = count > 0 ? 'flex' : 'none';
   badge.textContent = count;
 }
 
 document.getElementById('openFilters').onclick = () => filterSheet.classList.add('open');
-document.getElementById('applyFiltersBtn').onclick = () => {
-  filterSheet.classList.remove('open');
-  renderList();
-};
+document.getElementById('applyFiltersBtn').onclick = () => { filterSheet.classList.remove('open'); renderList(); };
 filterSheet.onclick = (e) => { if (e.target === filterSheet) filterSheet.classList.remove('open'); };
 
-// ---------- job list ----------
 function matchesFilters(j){
   if (filters.country !== 'all' && j.countryCode !== filters.country) return false;
   if (filters.employment !== 'all' && j.employment !== filters.employment) return false;
   if (filters.format !== 'all' && j.format !== filters.format) return false;
   if (filters.goal !== 'any' && j.goal !== filters.goal) return false;
   const q = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
-  if (q){
-    const hay = (j.title[lang] + ' ' + j.country[lang]).toLowerCase();
-    if (!hay.includes(q)) return false;
-  }
+  if (q){ const hay = (j.title[lang]+' '+j.country[lang]).toLowerCase(); if (!hay.includes(q)) return false; }
   return true;
 }
 
@@ -690,42 +566,40 @@ function renderList(){
   const t = UI[lang];
   const jobs = JOBS.filter(matchesFilters);
   document.getElementById('resultCount').textContent = t.resultsFound(jobs.length);
-
   listEl.innerHTML = '';
-  if (jobs.length === 0){
-    listEl.innerHTML = `<div class="empty-state">${t.noResults}</div>`;
-    return;
-  }
+  if (jobs.length === 0){ listEl.innerHTML = `<div class="empty-state">${t.noResults}</div>`; return; }
   jobs.forEach((j, idx) => {
     const el = document.createElement('div');
     el.className = 'job' + (idx === 0 ? ' featured' : '');
     const empLabel = j.employment === 'full' ? t.optFullTime : t.optPartTime;
     const statusLabel = j.status === 'open' ? t.statusOpen : t.statusClosed;
     const flag = FLAGS[j.countryCode] || '';
+    const icon = CATEGORY_ICON[j.category] || '💼';
+    const iconBg = CATEGORY_COLOR[j.category] || '#EEF1F0';
     el.innerHTML = `
       ${idx === 0 ? `<div class="badge">${t.featured}</div>` : ''}
-      <div class="row">
-        <div>
-          <h3>${flag} ${j.title[lang]}</h3>
-          <div class="meta">${j.country[lang]} · ${empLabel}</div>
+      <div class="thumb" style="background:${iconBg}">${icon}</div>
+      <div class="info">
+        <div class="row">
+          <div>
+            <h3>${flag} ${j.title[lang]}</h3>
+            <div class="meta">${j.country[lang]} · ${empLabel}</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="pay">${j.pay}</div>
+            <span class="status ${j.status}">${statusLabel}</span>
+          </div>
         </div>
-        <div style="text-align:right;">
-          <div class="pay">${j.pay}</div>
-          <span class="status ${j.status}">${statusLabel}</span>
-        </div>
+        <div class="tags">${j.tags[lang].map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
+        <div class="deadline">${t.deadlineLabel}: ${formatDeadline(j.deadline)}</div>
       </div>
-      <div class="tags">${j.tags[lang].map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
-      <div class="deadline">${t.deadlineLabel}: ${formatDeadline(j.deadline)}</div>
     `;
     el.onclick = () => openDetail(j);
     listEl.appendChild(el);
   });
 }
-
 document.getElementById('searchInput').addEventListener('input', renderList);
 
-
-// ---------- job detail ----------
 function openDetail(job){
   currentJob = job;
   const t = UI[lang];
@@ -739,24 +613,19 @@ function openDetail(job){
     <div class="desc">${job.desc[lang]}</div>
   `;
   detailEl.classList.add('open');
+  document.getElementById('mainNav').classList.add('hidden');
 }
+document.getElementById('back').onclick = () => { detailEl.classList.remove('open'); document.getElementById('mainNav').classList.remove('hidden'); };
 
-document.getElementById('back').onclick = () => detailEl.classList.remove('open');
 document.getElementById('applyBtn').onclick = () => applyForm.classList.add('open');
-
 document.getElementById('cvBtn').onclick = () => {
   const text = encodeURIComponent('CV / ' + (currentJob ? currentJob.title.en : 'general'));
   const url = 'https://t.me/' + CONTACT_USERNAME + '?text=' + text;
   if (tg) tg.openTelegramLink(url); else window.open(url, '_blank');
 };
-
 document.getElementById('contactBtnPage').addEventListener('click', (e) => {
   if (tg) { e.preventDefault(); tg.openTelegramLink('https://t.me/' + CONTACT_USERNAME); }
 });
-
-// PASTE your Formspree endpoint here after setting it up (see instructions).
-// Example: 'https://formspree.io/f/abcd1234'
-const FORMSPREE_URL = 'PASTE_YOUR_FORMSPREE_URL_HERE';
 
 document.getElementById('fSend').onclick = async () => {
   const name = document.getElementById('fName').value.trim();
@@ -764,47 +633,53 @@ document.getElementById('fSend').onclick = async () => {
   const message = document.getElementById('fMessage').value.trim();
   const t = UI[lang];
   const sendBtn = document.getElementById('fSend');
-
   if (!name || !contact) { alert(t.fillRequired); return; }
-
   const jobTitle = currentJob ? currentJob.title.en : 'General';
 
-  // Always tell the Telegram bot too (works once bot.py is running)
-  if (tg) {
-    tg.sendData(JSON.stringify({
-      type:'application', jobId: currentJob?.id, jobTitle, lang, name, contact, message
-    }));
-  }
+  if (tg) tg.sendData(JSON.stringify({ type:'application', jobId: currentJob?.id, jobTitle, lang, name, contact, message }));
 
-  // Also send straight to email via Formspree
   if (FORMSPREE_URL && FORMSPREE_URL.startsWith('https://formspree.io/')){
     sendBtn.textContent = t.sending;
     try {
-      const res = await fetch(FORMSPREE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ jobTitle, name, contact, message, lang })
-      });
+      const res = await fetch(FORMSPREE_URL, { method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
+        body: JSON.stringify({ jobTitle, name, contact, message, lang }) });
       if (!res.ok) throw new Error('bad response');
-    } catch (err) {
-      alert(t.sendError);
-      sendBtn.textContent = t.sendApplication;
-      return;
-    }
+    } catch(err){ alert(t.sendError); sendBtn.textContent = t.sendApplication; return; }
     sendBtn.textContent = t.sendApplication;
   }
-
   if (!tg && !(FORMSPREE_URL && FORMSPREE_URL.startsWith('https://formspree.io/'))){
     alert(t.demoAlert + JSON.stringify({ jobTitle, name, contact, message }));
   }
-
   applyForm.classList.remove('open');
   document.getElementById('fName').value = '';
   document.getElementById('fContact').value = '';
   document.getElementById('fMessage').value = '';
 };
 
-// ---------- init ----------
+function initMap(){
+  if (leafletMap) { leafletMap.invalidateSize(); return; }
+  leafletMap = L.map('map', { zoomControl:true }).setView([50.5, 8], 4.2);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap', maxZoom:18 }).addTo(leafletMap);
+  JOBS.forEach(j => {
+    if (!j.lat || !j.lng) return;
+    L.marker([j.lat, j.lng]).addTo(leafletMap).bindPopup(`<strong>${j.title[lang]}</strong><br>${j.country[lang]} · ${j.pay}`);
+  });
+}
+
+function renderReviews(){
+  const list = document.getElementById('reviewsList');
+  list.innerHTML = '';
+  REVIEWS.forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'review';
+    el.innerHTML = `<div class="stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+      <div class="quote">${r.text[lang]}</div>
+      <div class="author">${r.name[lang]} — ${r.country[lang]}</div>`;
+    list.appendChild(el);
+  });
+}
+
 setLang('en');
 </script>
 
